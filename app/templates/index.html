@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block content %}
+{{ form.hidden_tag() }}
+
+<table border="1">
+    <tr>
+        <th style="display:none;">{{ form.entry_id.label }}</th>
+        <th>{{ form.date.label }}</th>
+        <th>{{ form.posted_date.label }}</th>
+        <th>{{ form.check_number.label }}</th>
+        <th>{{ form.name.label }}</th>
+        <th>{{ form.debit.label }}</th>
+        <th>{{ form.credit.label }}</th>
+        <th>{{ form.account_type.label }}</th>
+        <th>{{ form.category_id.label }}</th>
+    </tr>
+    {% for entry in entries %}
+    <tr>
+        <td style="display:none;"> {{ entry.id }}</td>
+        <td> {{ entry.date }}</td>
+        <td> {{ entry.posted_date }}</td>
+        <td> {{ entry.check_number }}</td>
+        <td><a href="{{ url_for('alias', id=entry.id) }}"> {{ entry.name }} </a></td>
+        <td> {{ entry.debit }}</td>
+        <td> {{ entry.credit }}</td>
+        <td> {{ entry.account_type }}</td>
+        <td><a href="{{ url_for('category', id=entry.id) }}"> {{ entry.displayCategory() }} </a></td>
+    </tr>
+    {% endfor %}
+</table>
+
+{% endblock %}
