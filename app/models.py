@@ -9,7 +9,6 @@ entry_category = db.Table('entry_category',
 '''
 
 class Entry(db.Model):
-    print(db.session)
     id = db.Column(db.Integer, primary_key=True)
     date = db.Column(db.DateTime)  # transaction for CC
     posted_date = db.Column(db.DateTime)  # CC only
@@ -23,6 +22,12 @@ class Entry(db.Model):
     __table_args__ = (db.UniqueConstraint("date", "description", 'debit', 'credit'),) # must be tuple, don't remove comma
 
     category_id = db.Column(db.Integer, db.ForeignKey('category.id'))
+
+    '''
+    def __init__(self, **kwargs):
+        super(Entry, self).__init__(**kwargs)
+        print('here')
+    '''
 
     def getCategories(self):
         out = (None,None)
@@ -82,5 +87,88 @@ class NameMapping(db.Model):
 class Category(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(120))
-    parent_id = db.Column(db.Integer)  # 0 = top level cat, # = sub-cat
+    parent_id = db.Column(db.Integer, nullable=False)  # 0 = top level cat, # = sub-cat
     entries = db.relationship('Entry', backref='category_assoc', lazy='dynamic')
+
+    __table_args__ = (
+    db.UniqueConstraint("name", "parent_id"),)  # must be tuple, don't remove comma
+
+    def checkCategory(cat, sub=None):
+        id = None
+
+        print('addCategory:',cat,sub)
+        # does cat currently exist
+        catExists = db.session.query(db.exists().where(Category.name == cat)).scalar()
+        print(cat, ':', catExists)
+
+        # if exists, check sub
+        if catExists:
+
+            if sub:
+                subExists = db.session.query(db.exists().where(Category.name == cat)).scalar()
+                print(sub, ':', subExists)
+            else:
+                id = cat
+
+        # Cat does not exist return None
+        else:
+            pass
+
+    def catExistsByName(cat):
+        print(cat)
+        return Category.query.filter_by(name=cat).first()
+
+
+    def existsById(cat=None, sub=None):
+        exists = Category.query.filter_by(id=sub,parent_id=cat).first()
+        print(exists)
+
+    '''
+    Expected input/Output:
+    ('Bill') --> None, cat does not exist, add and will get id=1
+    ('Bill') --> 1, cat does  exist
+    ('Bill', 'Water') --> None or 1?, subCat does not exist, add and get id=2
+    ('Bill', 'Water') --> 2?, subCat does exist, add and get id=2
+    ('Bill', 'Electric')
+    ('Finance', '401K') --> None, cat AND subCat don't exist, will need to ???
+    
+    not expected
+    ('Water') -> with an expectation it would find an existing Bill:Water
+    this would create a new Category Water
+    '''
+    def existsByName(cat, sub=None):
+        id = None
+        print('existsByName:', cat,sub)
+        category = Category.query.filter_by(name=cat).first()
+        subCategory = Category.query.filter_by(name=sub).first()
+        print(category)
+        print(subCategory)
+
+        # category already exists, check subCat
+        if category:
+            # if a subCat name was passed in and subCat exists return its id
+            if sub and subCategory:
+                id = subCategory.id
+            # else no subCat name was passed or
+            else:
+                pass
+
+        # category does not exist, OK to add, return None
+        else:
+            pass
+
+        return id
+
+
+
+        #print('entries:', len(category.entries.all()))
+        #print('{}:{} - {}:{}'.format(cat,category.id,sub,subCategory.id))
+
+        #existing = Category.query.join(Category.entries).filter(Category.name == cat, Category.name == sub).first()
+        #print(existing)
+        #if existing != None:
+        #    print('Exists')
+
+
+        #exists = Category.query.filter_by(id=subCategory).filter_by(parent_id=category)
+        #print(exists)

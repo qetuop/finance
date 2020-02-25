@@ -37,11 +37,19 @@ def parseData(db, fileName, accountType):
                 name = description
                 nameMapping = NameMapping.query.filter_by(description=description).first()
                 if nameMapping:
-                    print(nameMapping.name)
                     name = nameMapping.name
 
+                # set existing categories - assume all have already been set, can't have 2 entries with the same
+                # description with different categories
+                category_id = None
+                existingEntry = Entry.query.filter_by(description=description).first()
+                if existingEntry:
+                    if existingEntry.category_id:
+                        category_id = existingEntry.category_id
+
                 entry = Entry(date=transDate, posted_date=postedDate, check_number=checkNumber, name=name,
-                              description=description, debit=debit, credit=credit, account_type=accountType)
+                              description=description, debit=debit, credit=credit, account_type=accountType,
+                              category_id=category_id)
                 try:
                     db.session.add(entry)
                     db.session.commit()

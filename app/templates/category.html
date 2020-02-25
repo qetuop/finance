@@ -1,20 +1,32 @@
 {% extends "base.html" %}
 
 {% block content %}
+
 <form action="" method="post" novalidate>
     {{ form.hidden_tag() }}
 
-    {{ entry.name }} <br>
+    <h1>{{ entry.name }}</h1> <br>
     {{ form.category.label }}
-    {{ form.category(size=32) }}
+    {{ form.category(size=1) }} {{ form.category.data }}
     {# {{ form.category.raw_data }} #}
     <br>
     {{ form.subCatagory.label }}
     {{ form.subCatagory(size=32) }}
+    {#{ sub }#}
     {# {{ form.subCatagory.raw_data }} #}
     <br>
-
     {{ form.submit() }}
     {{ form.cancel() }}
+</form>
+
+<script>
+    var category_select = document.getElementById('category')
+    var subCategory_select = document.getElementById('subCategory')
+
+    category_select.onchange = function() {
+        category = category_select.value
+        alert(category)
+    }
+</script>
 
     {% endblock %}

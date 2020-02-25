@@ -1,5 +1,5 @@
 .idea
-#uploads/*
+uploads/*
 *.bak*
 
 *.py[cod]

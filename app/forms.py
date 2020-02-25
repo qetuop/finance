@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, BooleanField, SubmitField
+from wtforms import StringField, PasswordField, BooleanField, SubmitField, SelectField, FileField
 from wtforms.validators import ValidationError, DataRequired, Email, EqualTo
 #from app.models import User
 
@@ -23,20 +23,23 @@ class EntryForm(FlaskForm):
     credit = StringField('Credit')
     account_type = StringField('Account Type')
     category_id = StringField('Category')
+    submit = SubmitField('Upload')
+    accountType = SelectField('Account Type')
+    file = FileField()
 
 class AliasForm(FlaskForm):
     name = StringField() # entry name
     id = StringField('Entry ID')
-    submit = SubmitField('rename')
-    cancel = SubmitField('cancel')
+    submit = SubmitField('Rename')
+    cancel = SubmitField('Cancel')
 
 class CategoryForm(FlaskForm):
-    category = StringField('Category')
+    category = SelectField('Category')
     subCatagory = StringField('Sub-Category')
     name = StringField('Name')
     id = StringField('Entry ID')
-    submit = SubmitField('rename')
-    cancel = SubmitField('cancel')
+    submit = SubmitField('Submit')
+    cancel = SubmitField('Cancel')
 '''
 class LoginForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired()])
