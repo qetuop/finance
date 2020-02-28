@@ -15,20 +15,20 @@
             <th>{{ form.debit.label }}</th>
             <th>{{ form.credit.label }}</th>
             <th>{{ form.account_type.label }}</th>
-            <th>{{ form.category_id.label }}</th>
+            <th>{{ form.tag_id.label }}</th>
         </tr>
         {% for entry in entries %}
         <tr>
             <td style="display:none;"> {{ entry.id }}</td>
-            <td> {{ entry.date }}</td>
-            <td> {{ entry.posted_date }}</td>
+            <td> {{ entry.date|datetime }}</td>
+            <td> {{ entry.posted_date|datetime }}</td>
             <td> {{ entry.check_number }}</td>
             <td><a href="{{ url_for('alias', id=entry.id) }}"> {{ entry.name }} </a></td>
             <td> {{ entry.description }}</td>
             <td> {{ entry.debit }}</td>
             <td> {{ entry.credit }}</td>
             <td> {{ entry.account_type }}</td>
-            <td><a href="{{ url_for('category', id=entry.id) }}"> {{ entry.displayCategory() }} </a></td>
+            <td><a href="{{ url_for('tag', id=entry.id) }}"> {{ entry.displayTag() }} </a></td>
         </tr>
         {% endfor %}
     </table>

@@ -12,6 +12,8 @@ date = db.Column(db.DateTime)   # transaction for CC
     debit = db.Column(db.Float)
     credit = db.Column(db.Float)
     '''
+
+
 class EntryForm(FlaskForm):
     entry_id = StringField('Entry ID')
     date = StringField('Date')
@@ -22,10 +24,11 @@ class EntryForm(FlaskForm):
     debit = StringField('Debit')
     credit = StringField('Credit')
     account_type = StringField('Account Type')
-    category_id = StringField('Category')
+    tag_id = StringField('Category')
     submit = SubmitField('Upload')
     accountType = SelectField('Account Type')
     file = FileField()
+
 
 class AliasForm(FlaskForm):
     name = StringField() # entry name
@@ -33,13 +36,16 @@ class AliasForm(FlaskForm):
     submit = SubmitField('Rename')
     cancel = SubmitField('Cancel')
 
+
 class CategoryForm(FlaskForm):
     category = SelectField('Category')
-    subCatagory = StringField('Sub-Category')
+    subCategory = SelectField('Sub-Category')
     name = StringField('Name')
     id = StringField('Entry ID')
     submit = SubmitField('Submit')
     cancel = SubmitField('Cancel')
+
+
 '''
 class LoginForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired()])

@@ -14,5 +14,9 @@
 
 {% block content %}
 {% endblock %}
+
+{% if form.errors %}
+{{ form.errors }}
+{% endif %}
 </body>
 </html>

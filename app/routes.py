@@ -1,9 +1,9 @@
-from flask import render_template, flash, redirect, url_for, request
+from flask import render_template, flash, redirect, url_for, request, jsonify
 from flask_wtf.file import FileField, FileRequired
 from app import app, db
 from app.forms import EntryForm, AliasForm, CategoryForm
 #from flask_login import current_user, login_user, logout_user, login_required
-from app.models import Entry, Category
+from app.models import Entry, Tag
 from werkzeug.urls import url_parse
 from werkzeug.utils import secure_filename
 from .my_parser import parseData
@@ -40,6 +40,7 @@ def index():
 
         # do this instead?  https://flask-wtf.readthedocs.io/en/stable/form.html#module-flask_wtf.file
 
+        # TODO create a route to handle the upload/parse
         # check if the post request has the file part
         if 'file' not in request.files:  # file or files?
             flash('No file part')
@@ -61,8 +62,6 @@ def index():
             elif int(form.accountType.data) == 2:
                 parseData(db, filename, 'Checking')
             return redirect('/')
-
-
 
     return render_template('index.html', title='Home', form=form, entries=entries)
 
@@ -87,59 +86,89 @@ def alias(id):
 
     return render_template('alias.html', form=form, entry=entry)
 
-@app.route('/category/<id>', methods=['GET', 'POST'])
-def category(id):
+@app.route('/subcategory/<category>')
+def subcategory(category):
+    print('subcategory:', category)
+    tags = Tag.query.filter_by(category=category).all()
+
+    tagArray = []
+
+    for tag in tags:
+        tagObj = {}
+        tagObj['id'] = str(tag.id)
+        tagObj['subCategory'] = tag.subCategory
+        tagArray.append(tagObj)
+
+    return jsonify({'tags': tagArray})
+
+
+
+# An entry will be passed in by id
+# get list of all tags and create the two drop downs
+# set the category DD to the entry's tag
+# set the subCat to that Cat's items
+@app.route('/tag/<id>', methods=['GET', 'POST'])
+def tag(id):
     entry = Entry.query.filter_by(id=id).first()
+    print('entry:', entry.id,entry.name, entry.tag_id)
+    entryTag = Tag.query.filter_by(id=entry.tag_id).first()
+    print(entryTag.category, entryTag.subCategory)
 
     form = CategoryForm()
 
 
-    categories = Category.query.filter_by(parent_id=0).all()
-    #cats = list((map(lambda x: x.name, categories)))
-    catList = [(str(i.id), i.name) for i in categories]    # id must be a str? else validate_on_submit will be False? why or use coerce=int?
-    form.category.choices = catList
+    tags = Tag.query.all()
+
+    # create a unique list of categories
+    tagList = [tag.category for tag in tags]
+    tagList = list(set(tagList))
+    tagList.sort()
+    print('cat:',tagList)
+
+    # TODO should i use the actual id? (value, label)
+    #categoryList = list((map(lambda x: x.name, categories)))
+    categoryList = [(tag, tag) for tag in tagList]    # id must be a str? else validate_on_submit will be False? why or use coerce=int?
+    form.category.choices = categoryList
+
+    # create the sub cat list for the entrie's tag
+    tags = Tag.query.filter_by(id=entry.tag_id).all()
+    print('tags:',tags)
+    tagList = [tag.subCategory for tag in tags]
+    tagList = list(set(tagList))
+    tagList.sort()
+    print('sub:',tagList)
+
+
+    subCategoryList = [(tag, tag) for tag in tagList]
+    print(subCategoryList)
+    form.subCategory.choices = subCategoryList
 
 
 
-    (cat,sub) = entry.getCategories()
     if request.method == 'GET':
         print('GET')
         print(form.category.data)
-        form.subCatagory.data = sub
+        form.category.data = entryTag.category
+        form.subCategory.data = entryTag.subCategory
 
     elif request.method == 'POST':
         print('POST',form.submit.data, form.validate_on_submit())
-
-        if form.validate_on_submit():
+        print('form.submit.data:', form.name.data, form.category.data, form.subCategory.data)
+        #if form.validate_on_submit():
             # The user pressed the "Submit" button
-            print('validate_on_submit')
-            if form.submit.data:
-                print('form.submit.data:', form.name.data, form.category.data, form.subCatagory.data)
-                tmpCat = Category.query.filter_by(id=form.category.data).first()
-                subCat = None
-                try:
-                    subCat = Category.existsByName(tmpCat.name, form.subCatagory.data).first()
-                except:
-                    pass
+            #print('validate_on_submit')
+        if form.submit.data:
+            print('form.submit.data:', form.name.data, form.category.data, form.subCategory.data)
+            rows_changed = Entry.query.filter_by(description=entry.description).update(dict(tag_id=form.subCategory.data))
+            print(rows_changed)
+            db.session.commit()
 
-                print('subCat:', subCat)
-                if subCat is None:
-                    subCat = Category(name=form.subCatagory.data, parent_id=form.category.data)
-                    db.session.add(subCat)
-                    db.session.commit()
-                else:
-                    pass
+            return redirect(url_for('index'))
 
-                rows_changed = Entry.query.filter_by(description=entry.description).update(dict(category_id=subCat.id))
-                print(rows_changed)
-                db.session.commit()
-
-                return redirect(url_for('index'))
-
-            # The user pressed the "Cancel" button
-            else:
-                return redirect(url_for('index'))
-
+        # The user pressed the "Cancel" button
+        else:
+            return redirect(url_for('index'))
+    '''
     # put down here or causes validate not to work
     print('entries id:',entry.category_id)
     subCat = Category.query.filter_by(id=entry.category_id).first()
@@ -152,6 +181,6 @@ def category(id):
 
     # https://youtu.be/I2dJuNwlIH0?t=69
     # https: // github.com / PrettyPrinted / dynamic_select_flask_wtf_javascript
-    # form.subCatagory.choices = [(subCat.id,subCat.name) for subCat in .....some DB query]
-
-    return render_template('category.html', form=form, entry=entry, sub=sub)
+    # form.subCategory.choices = [(subCat.id,subCat.name) for subCat in .....some DB query]
+    '''
+    return render_template('category.html', form=form, entry=entry)

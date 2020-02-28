@@ -21,7 +21,7 @@ class Entry(db.Model):
 
     __table_args__ = (db.UniqueConstraint("date", "description", 'debit', 'credit'),) # must be tuple, don't remove comma
 
-    category_id = db.Column(db.Integer, db.ForeignKey('category.id'))
+    tag_id = db.Column(db.Integer, db.ForeignKey('tag.id'))
 
     '''
     def __init__(self, **kwargs):
@@ -29,7 +29,7 @@ class Entry(db.Model):
         print('here')
     '''
 
-    def getCategories(self):
+    def getTags(self):
         out = (None,None)
         category = Category.query.filter_by(id=self.category_id).first()
         if category:
@@ -41,36 +41,11 @@ class Entry(db.Model):
                 out = (category.name,None)
         return out
 
-    def getCategory(self):
-        out = None
-        category = Category.query.filter_by(id=self.category_id).first()
-        if category:
-            if category.parent_id:
-                subCat = category
-                category = Category.query.filter_by(id=subCat.parent_id).first()
-                out = category.name
-            else:
-                out = category.name
-        return out
-
-    def getSubCategory(self):
-        out = None
-        category = Category.query.filter_by(id=self.category_id).first()
-        if category:
-            if category.parent_id:
-                out = category.name
-        return out
-
-    def displayCategory(self):
-        out = 'UNCATEGORIZED'
-        category = Category.query.filter_by(id=self.category_id).first()
-        if category:
-            if category.parent_id:
-                subCat = category
-                category = Category.query.filter_by(id=subCat.parent_id).first()
-                out = '{}:{}'.format(category.name,subCat.name)
-            else:
-                out = '{}'.format(category.name)
+    def displayTag(self):
+        out = 'none'
+        tag = Tag.query.filter_by(id=self.tag_id).first()
+        if tag:
+            out = '{}:{}'.format(tag.category,tag.subCategory)
 
         return out
 
@@ -83,15 +58,19 @@ class NameMapping(db.Model):
         db.UniqueConstraint("description", "name"),
     )
 
-
-class Category(db.Model):
+class AccountType(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(120))
-    parent_id = db.Column(db.Integer, nullable=False)  # 0 = top level cat, # = sub-cat
+
+class Tag(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    category = db.Column(db.String(120))
+    subCategory = db.Column(db.String(120))
+
     entries = db.relationship('Entry', backref='category_assoc', lazy='dynamic')
 
     __table_args__ = (
-    db.UniqueConstraint("name", "parent_id"),)  # must be tuple, don't remove comma
+    db.UniqueConstraint("category", "subCategory"),)  # must be tuple, don't remove comma
 
     def checkCategory(cat, sub=None):
         id = None

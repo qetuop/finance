@@ -1,6 +1,7 @@
 .idea
 uploads/*
 *.bak*
+bak/
 
 *.py[cod]
 

@@ -1,7 +1,8 @@
 from datetime import datetime
 from dateutil.parser import parse
-from app.models import Entry,NameMapping
+from app.models import Entry,NameMapping, Tag
 from config import Config
+
 
 def parseData(db, fileName, accountType):
     with open('%s/%s'% (Config.UPLOAD_FOLDER,fileName)) as file:
@@ -41,15 +42,15 @@ def parseData(db, fileName, accountType):
 
                 # set existing categories - assume all have already been set, can't have 2 entries with the same
                 # description with different categories
-                category_id = None
+                tag_id = (Tag.query.filter_by(category='UNCATEGORIZED').first()).id
                 existingEntry = Entry.query.filter_by(description=description).first()
                 if existingEntry:
-                    if existingEntry.category_id:
-                        category_id = existingEntry.category_id
+                    if existingEntry.tag_id:
+                        tag_id = existingEntry.tag_id
 
                 entry = Entry(date=transDate, posted_date=postedDate, check_number=checkNumber, name=name,
                               description=description, debit=debit, credit=credit, account_type=accountType,
-                              category_id=category_id)
+                              tag_id=tag_id)
                 try:
                     db.session.add(entry)
                     db.session.commit()
