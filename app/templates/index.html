@@ -25,8 +25,8 @@
             <td> {{ entry.check_number }}</td>
             <td><a href="{{ url_for('alias', id=entry.id) }}"> {{ entry.name }} </a></td>
             <td> {{ entry.description }}</td>
-            <td> {{ entry.debit }}</td>
-            <td> {{ entry.credit }}</td>
+            <td> {{ entry.debit|currency }}</td>
+            <td> {{ entry.credit|currency }}</td>
             <td> {{ entry.account_type }}</td>
             <td><a href="{{ url_for('tag', id=entry.id) }}"> {{ entry.displayTag() }} </a></td>
         </tr>

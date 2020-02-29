@@ -4,6 +4,8 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 import parser
 import babel
+import decimal
+import flask_babel
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -22,9 +24,18 @@ def format_datetime(value, format='medium'):
     else:
         return ''
 
+
 app.jinja_env.filters['datetime'] = format_datetime
 
 
+def format_currency(value, format='medium'):
+    if value > 0.0:
+        return babel.numbers.format_currency(value, 'USD', locale='en_US') #ocale=flask_babel.get_locale()
+        #return babel.numbers.format_currency( decimal.Decimal(value), "USD" )
+    else:
+        return ''
+
+app.jinja_env.filters['currency'] = format_currency
 
 from app import routes, models
 
