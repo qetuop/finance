@@ -1,10 +1,13 @@
 {% extends "base.html" %}
 
 {% block content %}
+
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.20/css/jquery.dataTables.css">
 <form action="/index" method="post" novalidate enctype="multipart/form-data">
     {{ form.hidden_tag() }}
 
-    <table border="1">
+    <table id="example" border="1">
+        <thead>
         <tr>
             <th style="display:none;">{{ form.entry_id.label }}</th>
             <th>{{ form.date.label }}</th>
@@ -17,6 +20,8 @@
             <th>{{ form.account_type.label }}</th>
             <th>{{ form.tag_id.label }}</th>
         </tr>
+        </thead>
+        <tbody>
         {% for entry in entries %}
         <tr>
             <td style="display:none;"> {{ entry.id }}</td>
@@ -31,17 +36,26 @@
             <td><a href="{{ url_for('tag', id=entry.id) }}"> {{ entry.displayTag() }} </a></td>
         </tr>
         {% endfor %}
+        </tbody>
     </table>
+
+  <script type="text/javascript" charset="utf8" src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.8.2.min.js"></script>
+  <script type="text/javascript" charset="utf8" src="http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/jquery.dataTables.min.js"></script>
+  <script>
+  $(function(){
+    $("#example").dataTable();
+  })
+  </script>
 
     {{ form.accountType.label }}
     {{ form.accountType(size=1) }} {{ form.submit() }}
     {{ form.file() }}
 
+
 </form>
 
 
-
-<input type="button" id="button" value="Click me!" />
+<input type="button" id="button" value="Click me!"/>
 
 <script type="text/javascript">
         function message () {
@@ -49,6 +63,7 @@
         }
         var button = document.getElementById('button');
         button.addEventListener('click', message, true);
-    </script>
+
+</script>
 
 {% endblock %}
