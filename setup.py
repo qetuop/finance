@@ -15,10 +15,10 @@ db.session.commit()
 
 def createCategories():
     tagDict = {
-        'Bill':['Electric','Water', 'HOA', 'Car Insurance', 'Credit Card Payment', 'Cable & Internet', 'Phone', 'Misc'],
+        'Bill':['Electric','Water', 'HOA', 'Car Insurance', 'Credit Card Payment', 'Cable & Internet', 'Phone', 'Mortgage', 'Misc'],
         'Household':['Retail', 'Food', 'Repair & Improvement', 'Misc'],
         'Entertainment':['Restaurants', 'Netflix DVD', 'Netflix Streaming', 'Misc'],
-        'Finance':['Mortgage', 'Cash', 'Account Transfer', 'Misc'],
+        'Finance':['Cash', 'Account Transfer', 'Misc'],
         'Transportation':['Fuel', 'Maintenance & Repair', 'Misc'],
         'Income':['Wages', 'Gift', 'Tax Refund', 'Cash Back', 'Misc'],
         'Health & Fitness': ['Dentist', 'Medical', 'Lab', 'Vet', 'Misc'],

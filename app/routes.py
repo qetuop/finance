@@ -3,7 +3,7 @@ from flask_wtf.file import FileField, FileRequired
 from app import app, db
 from app.forms import EntryForm, AliasForm, CategoryForm
 #from flask_login import current_user, login_user, logout_user, login_required
-from app.models import Entry, Tag
+from app.models import Entry, Tag, NameMapping
 from werkzeug.urls import url_parse
 from werkzeug.utils import secure_filename
 from .my_parser import parseData
@@ -74,10 +74,15 @@ def alias(id):
     if form.validate_on_submit():
         # The user pressed the "Submit" button
         if form.submit.data:
-            print('submit', form.name.data)
+            print('submit new name:', form.name.data)
             #entries = Entry.query.filter_by(name=form.name.data).all()
             rows_changed = Entry.query.filter_by(name=origName).update(dict(name=form.name.data))
-            print(rows_changed)
+            print('rows_changed:',rows_changed)
+
+            # add to NameMapping table
+            nameMapping = NameMapping(description=entry.description, name=form.name.data)
+            db.session.add(nameMapping)
+
             db.session.commit()
             return redirect(url_for('index'))
         # The user pressed the "Cancel" button

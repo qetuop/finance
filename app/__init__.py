@@ -29,7 +29,7 @@ app.jinja_env.filters['datetime'] = format_datetime
 
 
 def format_currency(value, format='medium'):
-    if value > 0.0:
+    if value != 0.0:
         return babel.numbers.format_currency(value, 'USD', locale='en_US') #ocale=flask_babel.get_locale()
         #return babel.numbers.format_currency( decimal.Decimal(value), "USD" )
     else:

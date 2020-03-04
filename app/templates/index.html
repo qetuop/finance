@@ -17,6 +17,7 @@
             <th>{{ form.description.label }}</th>
             <th>{{ form.debit.label }}</th>
             <th>{{ form.credit.label }}</th>
+            <th>{{ form.amount.label }}</th>
             <th>{{ form.account_type.label }}</th>
             <th>{{ form.tag_id.label }}</th>
         </tr>
@@ -32,6 +33,7 @@
             <td> {{ entry.description }}</td>
             <td> {{ entry.debit|currency }}</td>
             <td> {{ entry.credit|currency }}</td>
+            <td> {{ entry.getAmount()|currency }}</td>
             <td> {{ entry.account_type }}</td>
             <td><a href="{{ url_for('tag', id=entry.id) }}"> {{ entry.displayTag() }} </a></td>
         </tr>
@@ -39,12 +41,39 @@
         </tbody>
     </table>
 
-  <script type="text/javascript" charset="utf8" src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.8.2.min.js"></script>
-  <script type="text/javascript" charset="utf8" src="http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/jquery.dataTables.min.js"></script>
+  <script type="text/javascript" charset="utf8" src="https://code.jquery.com/jquery-3.3.1.js"></script>
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.js"></script>
+
   <script>
-  $(function(){
-    $("#example").dataTable();
-  })
+$(document).ready(function() {
+    $('#example').DataTable( {
+        "iDisplayLength": 50,
+
+        "columnDefs": [
+            {
+                "targets": [ 2 ],
+                "visible": false,
+                "searchable": false
+            },
+            {
+                "targets": [ 3 ],
+                "visible": false,
+                "searchable": false
+            },
+            {
+                "targets": [ 6 ],
+                "visible": false,
+                "searchable": false
+            },
+            {
+                "targets": [ 7 ],
+                "visible": false,
+                "searchable": false
+            }
+        ]
+    } );
+} );
+
   </script>
 
     {{ form.accountType.label }}

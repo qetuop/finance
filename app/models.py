@@ -23,6 +23,20 @@ class Entry(db.Model):
 
     tag_id = db.Column(db.Integer, db.ForeignKey('tag.id'))
 
+    def getAmount(self):
+        sign = 1
+        # CC debit = -
+        # CC credit = +
+        # checking debit = -
+        # checking credit = +
+        # mm debit = -
+        # mm credit = +
+        if self.debit > 0.0:
+            return -1*self.debit
+        else:
+            return self.credit
+
+
     '''
     def __init__(self, **kwargs):
         super(Entry, self).__init__(**kwargs)

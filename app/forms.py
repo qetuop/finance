@@ -23,6 +23,7 @@ class EntryForm(FlaskForm):
     description = StringField('Description')
     debit = StringField('Debit')
     credit = StringField('Credit')
+    amount = StringField('Amount')
     account_type = StringField('Account Type')
     tag_id = StringField('Category')
     submit = SubmitField('Upload')
