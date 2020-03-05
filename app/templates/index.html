@@ -3,6 +3,9 @@
 {% block content %}
 
 <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.20/css/jquery.dataTables.css">
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.20/css/jquery.dataTables.min.css">
+
+
 <form action="/index" method="post" novalidate enctype="multipart/form-data">
     {{ form.hidden_tag() }}
 
@@ -39,9 +42,25 @@
         </tr>
         {% endfor %}
         </tbody>
+        <tfoot>
+            <tr>
+                <th style="display:none;">{{ form.entry_id.label }}</th>
+            <th>{{ form.date.label }}</th>
+            <th>{{ form.posted_date.label }}</th>
+            <th>{{ form.check_number.label }}</th>
+            <th>{{ form.name.label }}</th>
+            <th>{{ form.description.label }}</th>
+            <th>{{ form.debit.label }}</th>
+            <th>{{ form.credit.label }}</th>
+            <th>{{ form.amount.label }}</th>
+            <th>{{ form.account_type.label }}</th>
+            <th>{{ form.tag_id.label }}</th>
+            </tr>
+        </tfoot>
     </table>
 
-  <script type="text/javascript" charset="utf8" src="https://code.jquery.com/jquery-3.3.1.js"></script>
+    <script type="text/javascript" charset="utf8" src="https://code.jquery.com/jquery-3.3.1.js"></script>
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js"></script>
     <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.js"></script>
 
   <script>
@@ -75,6 +94,29 @@ $(document).ready(function() {
     } );
 } );
 
+$(document).ready(function() {
+    // Setup - add a text input to each footer cell
+    $('#example tfoot th').each( function () {
+        var title = $(this).text();
+        $(this).html( '<input type="text" placeholder="Search '+title+'" />' );
+    } );
+
+    // DataTable
+    var table = $('#example').DataTable();
+
+    // Apply the search
+    table.columns().every( function () {
+        var that = this;
+
+        $( 'input', this.footer() ).on( 'keyup change clear', function () {
+            if ( that.search() !== this.value ) {
+                that
+                    .search( this.value )
+                    .draw();
+            }
+        } );
+    } );
+} );
   </script>
 
     {{ form.accountType.label }}
