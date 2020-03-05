@@ -20,7 +20,7 @@ def createCategories():
         'Entertainment':['Restaurants', 'Netflix DVD', 'Netflix Streaming', 'Misc'],
         'Finance':['Cash', 'Account Transfer', 'Misc'],
         'Transportation':['Fuel', 'Maintenance & Repair', 'Misc'],
-        'Income':['Wages', 'Gift', 'Tax Refund', 'Cash Back', 'Misc'],
+        'Income':['Dividend','Wages', 'Gift', 'Tax Refund', 'Cash Back', 'Misc'],
         'Health & Fitness': ['Dentist', 'Medical', 'Lab', 'Vet', 'Misc'],
         'Investments': ['Vanguard', 'Misc'],
         'UNCATEGORIZED':['Misc']

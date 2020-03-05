@@ -80,10 +80,20 @@ def alias(id):
             print('rows_changed:',rows_changed)
 
             # add to NameMapping table
-            nameMapping = NameMapping(description=entry.description, name=form.name.data)
-            db.session.add(nameMapping)
+            # TODO: do this better?
+            nameMapping = NameMapping.query.filter_by(description=entry.description).first()
+            print("NameMapping:",nameMapping)
+            if nameMapping is None:
+                nameMapping = NameMapping(description=entry.description, name=form.name.data)
+                db.session.add(nameMapping)
 
+            else:
+                rows_changed = NameMapping.query.filter_by(description=entry.description).update(dict(name=form.name.data))
+                print('rc:', rows_changed)
+
+            print('commit mapping')
             db.session.commit()
+
             return redirect(url_for('index'))
         # The user pressed the "Cancel" button
         else:

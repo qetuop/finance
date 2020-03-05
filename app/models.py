@@ -43,18 +43,6 @@ class Entry(db.Model):
         print('here')
     '''
 
-    def getTags(self):
-        out = (None,None)
-        category = Category.query.filter_by(id=self.category_id).first()
-        if category:
-            if category.parent_id:
-                subCat = category
-                category = Category.query.filter_by(id=subCat.parent_id).first()
-                out = (category.name,subCat.name)
-            else:
-                out = (category.name,None)
-        return out
-
     def displayTag(self):
         out = 'none'
         tag = Tag.query.filter_by(id=self.tag_id).first()
@@ -69,7 +57,7 @@ class NameMapping(db.Model):
     description = db.Column(db.String(120))  # bank entered name
     name = db.Column(db.String(120))  # user entered name
     __table_args__ = (
-        db.UniqueConstraint("description", "name"),
+        db.UniqueConstraint("description"),
     )
 
 class AccountType(db.Model):
