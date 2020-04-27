@@ -17,7 +17,7 @@ def format_datetime(value, format='medium'):
         format="EEEE, d. MMMM y 'at' HH:mm"
     elif format == 'medium':
         #format="EE dd.MM.y HH:mm"
-        format = "MM/dd/y"
+        format = "M/d/y"
 
     if value:
         return babel.dates.format_datetime(value, format)
@@ -29,11 +29,13 @@ app.jinja_env.filters['datetime'] = format_datetime
 
 
 def format_currency(value, format='medium'):
-    if value != 0.0:
-        return babel.numbers.format_currency(value, 'USD', locale='en_US') #ocale=flask_babel.get_locale()
-        #return babel.numbers.format_currency( decimal.Decimal(value), "USD" )
-    else:
+    if value == 0.0:
         return ''
+    elif format == 'medium':
+        return babel.numbers.format_currency(value, 'USD', locale='en_US')  # ocale=flask_babel.get_locale()
+        #return babel.numbers.format_currency( decimal.Decimal(value), "USD" )
+    elif format == 'simple':
+        return value
 
 app.jinja_env.filters['currency'] = format_currency
 

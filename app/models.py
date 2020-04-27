@@ -12,7 +12,7 @@ class Entry(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     date = db.Column(db.DateTime)  # transaction for CC
     posted_date = db.Column(db.DateTime)  # CC only
-    check_number = db.Column(db.Integer)  # checking/MM
+    check_number = db.Column(db.Integer)  # checking/MM   TODO: should this be a string?  values are '00000000163'
     name = db.Column(db.String(120))  # user entered name
     description = db.Column(db.String(120))  # bank entered name
     debit = db.Column(db.Float)
