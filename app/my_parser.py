@@ -61,4 +61,25 @@ def parseData(db, fileName, accountType):
                 #finally:
                 #    db.session.close()  # optional, depends on use case
 
+def parseNameMappings(db, fileName):
+    with open('%s/%s' % (Config.BACKUP_FOLDER, fileName)) as file:
+        data = file.readlines()[1:]
+        for line in data:
+            if line.strip():  # skip ws
+                raw = line.strip() # strip newline chars
+                raw = raw.split(',')  # TODO only split on commas outsied of "'s
+                raw = list(map(lambda x: x.replace('"', ''), raw))  # strip out "'s
+
+                description = raw[0]
+                name = raw[1]
+                #print(description,name)
+
+                nameMapping = NameMapping(description=description, name=name)
+                try:
+                    db.session.add(nameMapping)  # will fail if description already exists
+                    db.session.commit()
+                except Exception as e:
+                    print(e)
+                    db.session.rollback()
+
 
