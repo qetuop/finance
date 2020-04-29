@@ -8,3 +8,4 @@ class Config(object):
                               'sqlite:///' + os.path.join(basedir, 'app.db')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     UPLOAD_FOLDER = os.path.join(basedir, 'uploads')
+    BACKUP_FOLDER = os.path.join(basedir, 'backup')

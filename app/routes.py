@@ -7,6 +7,7 @@ from app.models import Entry, Tag, NameMapping
 from werkzeug.urls import url_parse
 from werkzeug.utils import secure_filename
 from .my_parser import parseData
+from .my_writter import writeAll
 
 
 ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif', 'csv'}
@@ -34,34 +35,38 @@ def index():
     if request.method == 'GET':
         print('GET')
     elif request.method == 'POST':
-        print('POST - upload stuff')
+        print('POST')
         #if form.validate_on_submit():  # do i need this?
+        if form.export.data:
+            print('EXPORT DATA:')
+            writeAll(db)
 
+        elif form.submit.data:
+            print('Upload DATA:')
+            # do this instead?  https://flask-wtf.readthedocs.io/en/stable/form.html#module-flask_wtf.file
 
-        # do this instead?  https://flask-wtf.readthedocs.io/en/stable/form.html#module-flask_wtf.file
-
-        # TODO create a route to handle the upload/parse
-        # check if the post request has the file part
-        if 'file' not in request.files:  # file or files?
-            flash('No file part')
-            return redirect(request.url)
-        file = request.files['file']
-        # if user does not select file, browser also
-        # submit an empty part without filename
-        if file.filename == '':
-            flash('No selected file')
-            return redirect(request.url)
-        if file and allowed_file(file.filename):
-            filename = secure_filename(file.filename)
-            print('file:',filename, form.accountType.data)
-            flash('foo')
-            if int(form.accountType.data) == 0:
-                parseData(db, filename, 'Money Market')
-            elif int(form.accountType.data) == 1:
-                parseData(db, filename, 'Credit Card')
-            elif int(form.accountType.data) == 2:
-                parseData(db, filename, 'Checking')
-            return redirect('/')
+            # TODO create a route to handle the upload/parse
+            # check if the post request has the file part
+            if 'file' not in request.files:  # file or files?
+                flash('No file part')
+                return redirect(request.url)
+            file = request.files['file']
+            # if user does not select file, browser also
+            # submit an empty part without filename
+            if file.filename == '':
+                flash('No selected file')
+                return redirect(request.url)
+            if file and allowed_file(file.filename):
+                filename = secure_filename(file.filename)
+                print('file:',filename, form.accountType.data)
+                flash('foo')
+                if int(form.accountType.data) == 0:
+                    parseData(db, filename, 'Money Market')
+                elif int(form.accountType.data) == 1:
+                    parseData(db, filename, 'Credit Card')
+                elif int(form.accountType.data) == 2:
+                    parseData(db, filename, 'Checking')
+                return redirect('/')
 
     return render_template('index.html', title='Home', form=form, entries=entries)
 

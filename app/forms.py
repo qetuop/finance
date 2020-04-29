@@ -29,6 +29,7 @@ class EntryForm(FlaskForm):
     submit = SubmitField('Upload')
     accountType = SelectField('Account Type')
     file = FileField()
+    export = SubmitField('Export')
 
 
 class AliasForm(FlaskForm):

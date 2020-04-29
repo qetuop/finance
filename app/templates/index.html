@@ -122,20 +122,10 @@ $(document).ready(function() {
     {{ form.accountType.label }}
     {{ form.accountType(size=1) }} {{ form.submit() }}
     {{ form.file() }}
+    <br>
+    {{ form.export() }}
 
 
 </form>
-
-
-<input type="button" id="button" value="Click me!"/>
-
-<script type="text/javascript">
-        function message () {
-        alert("Hello!");
-        }
-        var button = document.getElementById('button');
-        button.addEventListener('click', message, true);
-
-</script>
 
 {% endblock %}
