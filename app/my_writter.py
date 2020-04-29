@@ -68,7 +68,6 @@ def writeAccount(accountType):
 def writeEntries():
     accountTypes = AccountType.query.all()
     for accountType in accountTypes:
-        print(accountType.name)
         writeAccount(accountType.name)
 
 def writeNameMappings():
@@ -78,17 +77,26 @@ def writeNameMappings():
     nameMappings = NameMapping.query.all()
     for nameMapping in nameMappings:
         nameMappingFile.write('"{}","{}"\n'.format(nameMapping.description,nameMapping.name))
+'''
+def writeTags():
+    tagFile = open('%s/tags.csv'%Config.BACKUP_FOLDER, "w")
+    tagFile.write("\"Description\",\"Tag\"\n")
 
+    tags = Tag.querry.all()
+    for tag in tags:
+        entry = Entry.query.filter_by(id=tag.id)
+        tagFile.write('"{}","{}"\n'.format(entry.description,tag.name))
+'''
 def writeAll(db):
     writeEntries()
     writeNameMappings()
 
+    #writeTags()
 
     # close each account
-    for f in accountFileDict.values():
-        f.close()
+    #for f in accountFileDict.values():
+    #    f.close()
 
 
 if __name__ == '__main__':
-    print(__name__)
     writeAll(db)
