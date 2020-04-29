@@ -2,7 +2,7 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from config import Config
 from app.models import NameMapping, Tag, Entry, AccountType
-from app.my_parser import parseData
+from app.my_parser import parseData, parseNameMappings
 from app import db
 
 #app = Flask(__name__)
@@ -16,7 +16,7 @@ db.session.commit()
 def createCategories():
     tagDict = {
         'Bill':['Electric','Water', 'HOA', 'Car Insurance', 'Credit Card Payment', 'Cable & Internet', 'Phone', 'Mortgage', 'Misc'],
-        'Household':['Retail', 'Food', 'Repair & Improvement', 'Misc'],
+        'Household':['Retail', 'Food', 'Clothes', 'Repair & Improvement', 'Misc'],
         'Entertainment':['Restaurants', 'Netflix DVD', 'Netflix Streaming', 'Misc'],
         'Finance':['Cash', 'Account Transfer', 'Misc'],
         'Transportation':['Fuel', 'Maintenance & Repair', 'Misc'],
@@ -44,9 +44,12 @@ if __name__ == '__main__':
     createAccounTypes()
     createCategories()
 
-    parseData(db, 'cc_sample.csv', 'Credit Card')
-    parseData(db, 'mm_sample.csv', 'Money Market')
-    parseData(db, 'check_sample.csv', 'Checking')
+    # import name mappings
+    parseNameMappings(db, 'nameMappings.csv')
+
+    #parseData(db, 'cc_sample.csv', 'Credit Card')
+    #parseData(db, 'mm_sample.csv', 'Money Market')
+    #parseData(db, 'check_sample.csv', 'Checking')
 
 
 
