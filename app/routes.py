@@ -7,8 +7,8 @@ from app.models import Entry, Tag, NameMapping
 from werkzeug.urls import url_parse
 from werkzeug.utils import secure_filename
 from .my_parser import parseData
-from .my_writter import exportData
-from .my_reader import importData
+from .my_writter import backupData
+from .my_reader import restoreData
 from config import Config
 
 ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif', 'csv'}
@@ -38,13 +38,13 @@ def index():
     elif request.method == 'POST':
         print('POST')
         #if form.validate_on_submit():  # do i need this?
-        if form.exportData.data:
+        if form.backup.data:
             print('EXPORT DATA:')
-            exportData(db)
+            backupData(db)
 
-        elif form.importData.data:
+        elif form.restore.data:
             print('IMPORT DATA:')
-            importData(db)
+            restoreData(db)
 
         elif form.submit.data:
             print('Upload DATA:')

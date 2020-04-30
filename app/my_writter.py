@@ -87,7 +87,7 @@ def writeTags():
         entry = Entry.query.filter_by(id=tag.id)
         tagFile.write('"{}","{}"\n'.format(entry.description,tag.name))
 '''
-def exportData(db):
+def backupData(db):
     writeEntries()
     writeNameMappings()
 
@@ -99,4 +99,4 @@ def exportData(db):
 
 
 if __name__ == '__main__':
-    exportData(db)
+    backupData(db)
