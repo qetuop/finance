@@ -45,11 +45,11 @@ if __name__ == '__main__':
     createCategories()
 
     # import name mappings
-    parseNameMappings(db, 'nameMappings.csv')
+    parseNameMappings(db, '%s/%s' % (Config.BACKUP_FOLDER, 'nameMappings.csv'))
 
-    #parseData(db, 'cc_sample.csv', 'Credit Card')
-    #parseData(db, 'mm_sample.csv', 'Money Market')
-    #parseData(db, 'check_sample.csv', 'Checking')
+    parseData(db, '%s/%s' % (Config.UPLOAD_FOLDER, 'cc_sample.csv'), 'Credit Card')
+    parseData(db, '%s/%s' % (Config.UPLOAD_FOLDER, 'mm_sample.csv'), 'Money Market')
+    parseData(db, '%s/%s' % (Config.UPLOAD_FOLDER, 'check_sample.csv'), 'Checking')
 
 
 

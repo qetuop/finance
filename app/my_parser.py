@@ -4,8 +4,8 @@ from app.models import Entry,NameMapping, Tag
 from config import Config
 
 
-def parseData(db, fileName, accountType):
-    with open('%s/%s'% (Config.UPLOAD_FOLDER,fileName)) as file:
+def parseData(db, fileName, accountType, parseExtra=False):
+    with open(fileName) as file:
         data = file.readlines()[1:]
         for line in data:
             if line.strip():  # skip ws
@@ -48,6 +48,16 @@ def parseData(db, fileName, accountType):
                     if existingEntry.tag_id:
                         tag_id = existingEntry.tag_id
 
+                # reading backupd up data, grab extra fields (name, tag) TODO: how does this meld with the nameMapping?
+                if parseExtra:
+                    name = raw[5]
+                    tag = raw[6]
+                    category = tag.split(':')[0]
+                    subcategory = tag.split(':')[1]
+                    #print(name,category,subcategory)
+                    tag_id = (Tag.query.filter_by(category=category).filter_by(subCategory=subcategory).first()).id
+
+
                 entry = Entry(date=transDate, posted_date=postedDate, check_number=checkNumber, name=name,
                               description=description, debit=debit, credit=credit, account_type=accountType,
                               tag_id=tag_id)
@@ -62,24 +72,27 @@ def parseData(db, fileName, accountType):
                 #    db.session.close()  # optional, depends on use case
 
 def parseNameMappings(db, fileName):
-    with open('%s/%s' % (Config.BACKUP_FOLDER, fileName)) as file:
-        data = file.readlines()[1:]
-        for line in data:
-            if line.strip():  # skip ws
-                raw = line.strip() # strip newline chars
-                raw = raw.split(',')  # TODO only split on commas outsied of "'s
-                raw = list(map(lambda x: x.replace('"', ''), raw))  # strip out "'s
+    try:
+        with open(fileName) as file:
+            data = file.readlines()[1:]
+            for line in data:
+                if line.strip():  # skip ws
+                    raw = line.strip() # strip newline chars
+                    raw = raw.split(',')  # TODO only split on commas outsied of "'s
+                    raw = list(map(lambda x: x.replace('"', ''), raw))  # strip out "'s
 
-                description = raw[0]
-                name = raw[1]
-                #print(description,name)
+                    description = raw[0]
+                    name = raw[1]
+                    #print(description,name)
 
-                nameMapping = NameMapping(description=description, name=name)
-                try:
-                    db.session.add(nameMapping)  # will fail if description already exists
-                    db.session.commit()
-                except Exception as e:
-                    print(e)
-                    db.session.rollback()
+                    nameMapping = NameMapping(description=description, name=name)
+                    try:
+                        db.session.add(nameMapping)  # will fail if description already exists
+                        db.session.commit()
+                    except Exception as e:
+                        print(e)
+                        db.session.rollback()
+    except FileNotFoundError:
+        print('File does not exist')
 
 

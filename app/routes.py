@@ -7,8 +7,9 @@ from app.models import Entry, Tag, NameMapping
 from werkzeug.urls import url_parse
 from werkzeug.utils import secure_filename
 from .my_parser import parseData
-from .my_writter import writeAll
-
+from .my_writter import exportData
+from .my_reader import importData
+from config import Config
 
 ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif', 'csv'}
 def allowed_file(filename):
@@ -37,9 +38,13 @@ def index():
     elif request.method == 'POST':
         print('POST')
         #if form.validate_on_submit():  # do i need this?
-        if form.export.data:
+        if form.exportData.data:
             print('EXPORT DATA:')
-            writeAll(db)
+            exportData(db)
+
+        elif form.importData.data:
+            print('IMPORT DATA:')
+            importData(db)
 
         elif form.submit.data:
             print('Upload DATA:')
@@ -60,6 +65,7 @@ def index():
                 filename = secure_filename(file.filename)
                 print('file:',filename, form.accountType.data)
                 flash('foo')
+                filename = '%s/%s' % (Config.UPLOAD_FOLDER, filename)
                 if int(form.accountType.data) == 0:
                     parseData(db, filename, 'Money Market')
                 elif int(form.accountType.data) == 1:
