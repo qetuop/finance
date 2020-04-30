@@ -9,9 +9,7 @@ from app import db
 #app.config.from_object(Config)
 #db = SQLAlchemy(app)
 
-db.drop_all()
-db.create_all()
-db.session.commit()
+
 
 def createCategories():
     tagDict = {
@@ -40,16 +38,26 @@ def createAccounTypes():
         db.session.commit()
 
 
-if __name__ == '__main__':
+def setup():
+    db.drop_all()
+    db.create_all()
+    db.session.commit()
+
     createAccounTypes()
     createCategories()
 
+def testSetup():
     # import name mappings
     parseNameMappings(db, '%s/%s' % (Config.BACKUP_FOLDER, 'nameMappings.csv'))
 
     parseData(db, '%s/%s' % (Config.UPLOAD_FOLDER, 'cc_sample.csv'), 'Credit Card')
     parseData(db, '%s/%s' % (Config.UPLOAD_FOLDER, 'mm_sample.csv'), 'Money Market')
     parseData(db, '%s/%s' % (Config.UPLOAD_FOLDER, 'check_sample.csv'), 'Checking')
+
+if __name__ == '__main__':
+    setup()
+
+    # testSetup()
 
 
 

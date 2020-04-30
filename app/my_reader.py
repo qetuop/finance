@@ -4,14 +4,13 @@ from app.models import Entry, NameMapping, Tag, AccountType
 from config import Config
 from app import db, format_datetime, format_currency
 from app.my_parser import parseData, parseNameMappings
+from setup import setup
 
 
 def restoreData(db):
 
     # clear it all out, TODO: am i sure about this
-    db.drop_all()
-    db.create_all()
-    db.session.commit()
+    setup()
 
     # name Mappings
     parseNameMappings(db, 'nameMappings.csv')

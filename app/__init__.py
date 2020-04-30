@@ -47,4 +47,4 @@ from app import routes, models
 
 if __name__ == '__main__':
     print(__name__)
-    parser.parseData(db,'cc_sample.csv',True)
+    #parser.parseData(db,'cc_sample.csv',True)

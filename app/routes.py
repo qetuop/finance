@@ -112,6 +112,7 @@ def alias(id):
 
     return render_template('alias.html', form=form, entry=entry)
 
+# this is used to populate the subcategory dropdown
 @app.route('/subcategory/<category>')
 def subcategory(category):
     print('subcategory:', category)
