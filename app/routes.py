@@ -10,6 +10,8 @@ from .my_parser import parseData
 from .my_writter import backupData
 from .my_reader import restoreData
 from config import Config
+import sys
+import os
 
 ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif', 'csv'}
 def allowed_file(filename):
@@ -56,6 +58,7 @@ def index():
                 flash('No file part')
                 return redirect(request.url)
             file = request.files['file']
+
             # if user does not select file, browser also
             # submit an empty part without filename
             if file.filename == '':
@@ -63,8 +66,12 @@ def index():
                 return redirect(request.url)
             if file and allowed_file(file.filename):
                 filename = secure_filename(file.filename)
+
+                # save the file from ?the browser's cache? to a known dir so that it can be read
+                # the file object, werkzeug.FileStorage, does not have the full path or ?knows it?
+                file.save(os.path.join(Config.UPLOAD_FOLDER, filename))
+
                 print('file:',filename, form.accountType.data)
-                flash('foo')
                 filename = '%s/%s' % (Config.UPLOAD_FOLDER, filename)
                 if int(form.accountType.data) == 0:
                     parseData(db, filename, 'Money Market')
