@@ -13,7 +13,7 @@ def restoreData(db):
     setup()
 
     # name Mappings
-    parseNameMappings(db, 'nameMappings.csv')
+    parseNameMappings(db, '%s/%s' % (Config.BACKUP_FOLDER, 'nameMappings.csv'))
 
     # accounts
 

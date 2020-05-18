@@ -15,12 +15,12 @@ import sys
 def createCategories():
     tagDict = {
         'Bill':['Electric','Water', 'HOA', 'Car Insurance', 'Credit Card Payment', 'Cable & Internet', 'Phone', 'Mortgage', 'Misc'],
-        'Household':['Retail', 'Food', 'Clothes', 'Repair & Improvement', 'Misc'],
-        'Entertainment':['Restaurants', 'Netflix DVD', 'Netflix Streaming', 'Misc'],
+        'Household':['Retail', 'Food', 'Clothes', 'Repair & Improvement', 'Alcohol', 'Misc'],
+        'Entertainment':['Restaurants', 'Netflix DVD', 'Netflix Streaming', 'Video Games', 'Misc'],
         'Finance':['Cash', 'Account Transfer', 'Misc'],
         'Transportation':['Fuel', 'Maintenance & Repair', 'Misc'],
         'Income':['Dividend','Wages', 'Gift', 'Tax Refund', 'Cash Back', 'Misc'],
-        'Health & Fitness': ['Dentist', 'Medical', 'Lab', 'Vet', 'Misc'],
+        'Health & Fitness': ['Dentist', 'Medical', 'Lab', 'Vet', 'Haircut', 'Misc'],
         'Investments': ['Vanguard', 'Misc'],
         'UNCATEGORIZED':['Misc']
     }
@@ -57,7 +57,8 @@ def testSetup():
 
 if __name__ == '__main__':
     setup()
-    if sys.argv[1]:
+    print(len(sys.argv))
+    if len(sys.argv) > 1:
         testSetup()
 
 

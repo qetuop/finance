@@ -93,6 +93,6 @@ def parseNameMappings(db, fileName):
                         print(e)
                         db.session.rollback()
     except FileNotFoundError:
-        print('File does not exist')
+        print('File does not exist:', fileName)
 
 
