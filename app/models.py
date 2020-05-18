@@ -8,6 +8,13 @@ entry_category = db.Table('entry_category',
                           db.PrimaryKeyConstraint('entry_id', 'category_id'))
 '''
 
+# sqlalchemy.types.DateTime
+# Date and time types return objects from the Python datetime module. Most DBAPIs have built in support for the datetime
+# module, with the noted exception of SQLite. In the case of SQLite, date and time types are stored as strings which are
+# then converted back to datetime objects when rows are returned.
+# input= "4/28/2020" --> datetime.strptime(transDate, '%m/%d/%Y') = datetime object (2020-04-28 00:00:00) and various fields
+# --> sqlalchemy. DateTime = Depends SQLite vs Other DBs  --> Back out = datetime
+
 class Entry(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     date = db.Column(db.DateTime)  # transaction for CC

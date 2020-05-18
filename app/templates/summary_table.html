@@ -1,0 +1,16 @@
+    <table id="summary" border="1">
+        <thead>
+        <tr>
+            <th>{{ form.category.label }}</th>
+            <th>{{ form.amount.label }}</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for key in data.keys() %}
+        <tr>
+            <td> {{ key }} </td>
+            <td> {{ data[key]|currency }}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>

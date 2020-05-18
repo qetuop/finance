@@ -1,7 +1,9 @@
+import math
+
 from flask import render_template, flash, redirect, url_for, request, jsonify
 from flask_wtf.file import FileField, FileRequired
 from app import app, db
-from app.forms import EntryForm, AliasForm, CategoryForm
+from app.forms import EntryForm, AliasForm, CategoryForm, SummaryForm
 #from flask_login import current_user, login_user, logout_user, login_required
 from app.models import Entry, Tag, NameMapping
 from werkzeug.urls import url_parse
@@ -12,6 +14,7 @@ from .my_reader import restoreData
 from config import Config
 import sys
 import os
+from datetime import datetime, timedelta
 
 ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif', 'csv'}
 def allowed_file(filename):
@@ -218,3 +221,76 @@ def tag(id):
     # form.subCategory.choices = [(subCat.id,subCat.name) for subCat in .....some DB query]
     '''
     return render_template('category.html', form=form, entry=entry)
+
+@app.route('/summary', methods=['GET', 'POST'])
+@app.route('/summary/<data>', methods=['GET', 'POST'])
+def summary(data=None):
+    print("summary", request.method, request.args,data)
+
+    print(request)
+    start = request.args.get('start')
+    end = request.args.get('end')
+
+    if start == None:
+        startDate = datetime.today() - timedelta(days=31)
+        endDate =  datetime.today()
+    else:
+        #print('start:', start)
+        #print('end:', end)
+        # TODO: verify this
+        startDate = datetime.fromtimestamp(int(start)/1000)
+        endDate = datetime.fromtimestamp(int(end)/1000)
+
+
+    # get start, end date for range from datepicker - if none provided use today/-31days
+    #startDate = request.args.get('start', datetime.today() - timedelta(days=31))
+    #endDate = request.args.get('end', datetime.today())
+    print(startDate.date(),'---',endDate.date())
+
+    # get current date
+    #endDate = datetime.now()
+    #startDate = datetime.today() - timedelta(days=range)
+
+    # get all Entries from last XX days
+    entries = Entry.query.filter(Entry.date <= endDate).filter(Entry.date  >= startDate).all()
+    #print(entries)
+
+    # get categories
+    tags = Tag.query.all()
+
+    # create a unique list of categories
+    tagList = [tag.category for tag in tags]
+    tagList = list(set(tagList))
+    tagList.sort()
+    #print('cat:', tagList)
+
+    # create dict of category : [<entry>]
+    tagEntryDict = dict.fromkeys(tagList,[])
+    for category in tagList:
+        tagEntryDict[category] = Entry.query\
+                                      .join(Tag)\
+                                      .filter_by(category=category)\
+                                      .filter(Entry.date <= endDate).filter(Entry.date >= startDate)\
+                                      .all()
+
+    #print(tagEntryDict)
+
+    # sum up the amounts
+    # quick hack data storage
+    data = {}
+    for category in tagEntryDict.keys():
+        amount = 0.0
+        for entry in tagEntryDict[category]:
+            amount += abs(entry.getAmount())       # may need abs values for charts
+
+        #print(category,tagEntryDict[category], amount)
+
+        # don't need to display zero values
+        if amount > 0:
+            data[category] = amount
+
+
+    form = SummaryForm()
+    print(data)
+
+    return render_template('summary.html', form=form, data=data)  # the base.html references the form object, always pass one?

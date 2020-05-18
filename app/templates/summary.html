@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+
+{% block content %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
+
+<script>
+    console.log(Date());
+</script>
+
+<div id="reportrange" style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; width: 100%">
+    <i class="fa fa-calendar"></i>&nbsp;
+    <span></span> <i class="fa fa-caret-down"></i>
+</div>
+
+<br>
+
+    <table id="summary" border="1">
+        <thead>
+        <tr>
+            <th>{{ form.category.label }}</th>
+            <th>{{ form.amount.label }}</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for key in data.keys() %}
+        <tr>
+            <td> {{ key }} </td>
+            <td> {{ data[key]|currency }}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+<script type="text/javascript" src="https://cdn.jsdelivr.net/jquery/latest/jquery.min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+
+
+<script type="text/javascript">
+
+/*
+function myFunction(start,end) {
+    console.log(start._d.getTime(),end._d.getTime())
+
+    fetch('/summary', {
+        start: start,
+        end: end
+    });
+        //window.alert(start,end);
+}
+*/
+/*
+function myFunction(start,end){
+    const url = '/summary';
+    // The data we are going to send in our request
+    let data = {
+        start: start._d,
+        end: end._d
+    }
+    // The parameters we are gonna pass to the fetch function
+    let fetchData = {
+        method: 'POST',
+        body: data,
+        headers: new Headers()
+    }
+    fetch(url, fetchData)
+    .then(function() {
+        console.log('here')
+    });
+}
+*/
+
+function myFunction(start,end){
+
+    console.log(start,end)
+    $.ajax({
+      url: "/summary",
+      type: "get",
+      data: { start: start._d.getTime(),
+              end: end._d.getTime()
+            },
+      success: function(response) {
+        console.log(response) //$("#place_for_suggestions").html(response);
+      },
+      error: function(xhr) {
+        //Do Something to handle error
+      }
+    });
+};
+
+
+$(function() {
+    var start = moment().subtract(29, 'days');
+    var end = moment();
+
+    function cb(start, end) {
+        $('#reportrange span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
+
+        myFunction(start,end);
+    }
+
+    $('#reportrange').daterangepicker({
+        startDate: start,
+        endDate: end,
+        ranges: {
+           'Today': [moment(), moment()],
+           'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+           'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+           'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+           'This Month': [moment().startOf('month'), moment().endOf('month')],
+           'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+        }
+    }, cb);
+
+    cb(start, end);
+
+});
+
+</script>
+
+
+
+{% endblock %}

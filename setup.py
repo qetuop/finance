@@ -4,6 +4,7 @@ from config import Config
 from app.models import NameMapping, Tag, Entry, AccountType
 from app.my_parser import parseData, parseNameMappings
 from app import db
+import sys
 
 #app = Flask(__name__)
 #app.config.from_object(Config)
@@ -56,8 +57,8 @@ def testSetup():
 
 if __name__ == '__main__':
     setup()
-
-    # testSetup()
+    if sys.argv[1]:
+        testSetup()
 
 
 

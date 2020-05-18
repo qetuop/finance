@@ -71,7 +71,7 @@ $(document).ready(function() {
     $.fn.dataTable.moment( 'M/D/YYYY' );
 
     $('#example').DataTable( {
-        "iDisplayLength": 50,
+        "iDisplayLength": 10,
         stateSave: true,
 
         "columnDefs": [
@@ -129,7 +129,8 @@ $(document).ready(function() {
     {{ form.file() }}
     <br>
     {{ form.backup() }} {{ form.restore() }}
-
+    <br> <br>
+    <a href="{{ url_for('summary')}}"> Summary </a>
 
 </form>
 

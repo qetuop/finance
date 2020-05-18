@@ -32,6 +32,9 @@ class EntryForm(FlaskForm):
     backup = SubmitField('Export')
     restore = SubmitField('Import')
 
+class SummaryForm(FlaskForm):
+    category = StringField()
+    amount = StringField('Amount')
 
 class AliasForm(FlaskForm):
     name = StringField() # entry name
