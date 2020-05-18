@@ -223,8 +223,12 @@ def tag(id):
     return render_template('category.html', form=form, entry=entry)
 
 @app.route('/summary', methods=['GET', 'POST'])
-@app.route('/summary/<data>', methods=['GET', 'POST'])
-def summary(data=None):
+def summary():
+    form = SummaryForm()
+    return render_template('summary.html', form=form)
+
+@app.route('/summary_table', methods=['GET', 'POST'])
+def summary_table(data=None):
     print("summary", request.method, request.args,data)
 
     print(request)
@@ -293,4 +297,4 @@ def summary(data=None):
     form = SummaryForm()
     print(data)
 
-    return render_template('summary.html', form=form, data=data)  # the base.html references the form object, always pass one?
+    return render_template('summary_table.html', form=form, data=data)  # the base.html references the form object, always pass one?

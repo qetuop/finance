@@ -15,22 +15,7 @@
 
 <br>
 
-    <table id="summary" border="1">
-        <thead>
-        <tr>
-            <th>{{ form.category.label }}</th>
-            <th>{{ form.amount.label }}</th>
-        </tr>
-        </thead>
-        <tbody>
-        {% for key in data.keys() %}
-        <tr>
-            <td> {{ key }} </td>
-            <td> {{ data[key]|currency }}</td>
-        </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+<div id="place_for_table"></div>
 
 <script type="text/javascript" src="https://cdn.jsdelivr.net/jquery/latest/jquery.min.js"></script>
 <script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
@@ -39,49 +24,18 @@
 
 <script type="text/javascript">
 
-/*
-function myFunction(start,end) {
-    console.log(start._d.getTime(),end._d.getTime())
-
-    fetch('/summary', {
-        start: start,
-        end: end
-    });
-        //window.alert(start,end);
-}
-*/
-/*
-function myFunction(start,end){
-    const url = '/summary';
-    // The data we are going to send in our request
-    let data = {
-        start: start._d,
-        end: end._d
-    }
-    // The parameters we are gonna pass to the fetch function
-    let fetchData = {
-        method: 'POST',
-        body: data,
-        headers: new Headers()
-    }
-    fetch(url, fetchData)
-    .then(function() {
-        console.log('here')
-    });
-}
-*/
-
 function myFunction(start,end){
 
     console.log(start,end)
     $.ajax({
-      url: "/summary",
+      url: "/summary_table",
       type: "get",
       data: { start: start._d.getTime(),
               end: end._d.getTime()
             },
       success: function(response) {
-        console.log(response) //$("#place_for_suggestions").html(response);
+        console.log(response)
+        $("#place_for_table").html(response);
       },
       error: function(xhr) {
         //Do Something to handle error
