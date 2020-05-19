@@ -146,12 +146,21 @@ def subcategory(category):
 # set the subCat to that Cat's items
 @app.route('/tag/<id>', methods=['GET', 'POST'])
 def tag(id):
+    print("tag request:",request)
+
+
     entry = Entry.query.filter_by(id=id).first()
     print('entry:', entry.id,entry.name, entry.tag_id)
     entryTag = Tag.query.filter_by(id=entry.tag_id).first()
+
+    # TODO: not sure how this happened, need to invistagate
+    if entryTag == None:
+        entryTag = Tag.query.filter_by(category='UNCATEGORIZED').first()
+
     print(entryTag.category, entryTag.subCategory)
 
     form = CategoryForm()
+    form.description.data = entry.description
 
 
     tags = Tag.query.all()
@@ -190,7 +199,7 @@ def tag(id):
 
     elif request.method == 'POST':
         print('POST',form.submit.data, form.validate_on_submit())
-        print('form.submit.data:', form.name.data, form.category.data, form.subCategory.data)
+        print('form.submit.data: Name:{}, Category:{}*, Sub:{}*, Desc:{}*'.format(form.name.data, form.category.data, form.subCategory.data, form.description.data))
         #if form.validate_on_submit():
             # The user pressed the "Submit" button
             #print('validate_on_submit')
@@ -229,7 +238,7 @@ def summary():
 
 @app.route('/summary_table', methods=['GET', 'POST'])
 def summary_table(data=None):
-    print("summary", request.method, request.args,data)
+    print("summary", request.method, request.args, data)
 
     print(request)
     start = request.args.get('start')

@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, BooleanField, SubmitField, SelectField, FileField
+from wtforms import StringField, PasswordField, BooleanField, SubmitField, SelectField, FileField, TextAreaField
 from wtforms.validators import ValidationError, DataRequired, Email, EqualTo
 #from app.models import User
 
@@ -47,6 +47,7 @@ class CategoryForm(FlaskForm):
     category = SelectField('Category')
     subCategory = SelectField('Sub-Category')
     name = StringField('Name')
+    description = StringField('Description')
     id = StringField('Entry ID')
     submit = SubmitField('Submit')
     cancel = SubmitField('Cancel')
