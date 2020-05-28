@@ -9,13 +9,17 @@ RUN python -m venv venv
 RUN venv/bin/pip install -r requirements.txt
 
 COPY app app
-COPY finance.py config.py setup.py boot.sh app.db ./
+COPY uploads uploads
+COPY backup backup
+#COPY finance.py config.py setup.py boot.sh app.db ./
+COPY finance.py config.py setup.py boot.sh  ./
 RUN chmod +x boot.sh
 
 ENV FLASK_APP finance.py
 
 #RUN chown -R finance:finance ./
-RUN chown -R finance:finance finance.py config.py setup.py boot.sh app.db
+#RUN chown -R finance:finance finance.py config.py setup.py boot.sh app.db
+RUN chown -R finance:finance finance.py config.py setup.py boot.sh
 
 USER finance
 

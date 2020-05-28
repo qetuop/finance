@@ -1,5 +1,5 @@
 #!/bin/sh
 source venv/bin/activate
 
-#exec python setup.py
+python setup.py 1
 exec python finance.py

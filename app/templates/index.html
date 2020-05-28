@@ -7,7 +7,11 @@
 
 
 <form action="/index" method="post" novalidate enctype="multipart/form-data">
+
     {{ form.hidden_tag() }}
+
+    <h1><a href="{{ url_for('summary')}}"> Summary </a></h1>
+    <br> <br>
 
     <table id="example" border="1">
         <thead>
@@ -130,7 +134,7 @@ $(document).ready(function() {
     <br>
     {{ form.backup() }} {{ form.restore() }}
     <br> <br>
-    <a href="{{ url_for('summary')}}"> Summary </a>
+
 
 </form>
 

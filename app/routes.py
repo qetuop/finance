@@ -15,6 +15,7 @@ from config import Config
 import sys
 import os
 from datetime import datetime, timedelta
+from .forms import PlainTextWidget
 
 ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif', 'csv'}
 def allowed_file(filename):
@@ -90,26 +91,65 @@ def index():
 def alias(id):
     entry = Entry.query.filter_by(id=id).first()
     origName = entry.name
+    origDesc = entry.description
     form = AliasForm(obj=entry)
 
+    #form.exactMatch.data = True
+
+    # set to be "read only"
+    #setattr(getattr(form, 'description'), 'widget', PlainTextWidget())
+
+    '''
+    fields = [val for val in form._fields]
+    for fieldName in fields:
+        fieldProp = getattr(form, fieldName)
+        setattr(fieldProp, 'widget', PlainTextWidget())
+    '''
     if form.validate_on_submit():
         # The user pressed the "Submit" button
         if form.submit.data:
-            print('submit new name:', form.name.data)
+            matchDesc = form.description.data
+            newName   = form.name.data
+
+            print('submit NEW name:{}, Orig desc:{}, match Desc:"{}"'.format(newName, origDesc, matchDesc))
             #entries = Entry.query.filter_by(name=form.name.data).all()
-            rows_changed = Entry.query.filter_by(name=origName).update(dict(name=form.name.data))
+
+            # TODO: fix toggle -> have it populate the match field
+            #exactMatch = form.exactMatch.data
+            exactMatch = (matchDesc == origDesc)
+
+            # update ALL entries whose NAME = this entry's NAME   TODO: is this what i want? entires with different descriptions
+            # could then map to the same name and future changes to one would change them all
+            #rows_changed = Entry.query.filter_by(name=origName).update(dict(name=form.name.data))
+
+            # Or match to entries whose DESCRIPTION matches
+            rows_changed = 0
+            if exactMatch:
+                rows_changed = Entry.query.filter_by(description=origDesc).update(dict(name=newName))
+                db.session.commit()
+            else:
+                rows_changed = Entry.query.filter(Entry.description.ilike(r"%{}%".format(matchDesc)))\
+                    .update(dict(name=newName), synchronize_session=False)
+                # can also use  .update({"name":"second"}, synchronize_session=False)
+                db.session.commit()
+
             print('rows_changed:',rows_changed)
 
             # add to NameMapping table
             # TODO: do this better?
-            nameMapping = NameMapping.query.filter_by(description=entry.description).first()
-            print("NameMapping:",nameMapping)
-            if nameMapping is None:
-                nameMapping = NameMapping(description=entry.description, name=form.name.data)
-                db.session.add(nameMapping)
 
+
+            # Does it already exist
+            nameMapping = NameMapping.query.filter_by(description=matchDesc).first()
+            print("NameMapping:{}, exact match:{}".format(nameMapping, exactMatch))
+
+            # add mapping if no row in table with this description
+            if nameMapping is None:
+                nameMapping = NameMapping(description=matchDesc, name=newName, exact_match=exactMatch)
+                db.session.add(nameMapping)
+            # else update existing mapping
             else:
-                rows_changed = NameMapping.query.filter_by(description=entry.description).update(dict(name=form.name.data))
+                rows_changed = NameMapping.query.filter_by(description=matchDesc).update(dict(name=newName))
                 print('rc:', rows_changed)
 
             print('commit mapping')

@@ -2,7 +2,7 @@ from datetime import datetime
 from dateutil.parser import parse
 from app.models import Entry,NameMapping, Tag
 from config import Config
-
+from  distutils import util
 
 def parseData(db, fileName, accountType, parseExtra=False):
     with open(fileName) as file:
@@ -34,11 +34,48 @@ def parseData(db, fileName, accountType, parseExtra=False):
                 except:
                     credit = 0.0
 
+                # NAME MAPPING
+
                 # try to map the desc to a name, else use desc for name
                 name = description
-                nameMapping = NameMapping.query.filter_by(description=description).first()
+                print("\ntyring to map:", description)
+
+                # First try for an exact match, if found continue to next
+                nameMapping = NameMapping.query.filter_by(description=description).filter(NameMapping.exact_match == True).first()
+
                 if nameMapping:
                     name = nameMapping.name
+                    print("exact found: this desc:{}, mapping's desc:{}, mapping's name:{}".format(description,
+                                                                                                   nameMapping.description,
+                                                                                                   nameMapping.name))
+
+                # search all partial mappings
+                else:
+                    nameMappings = NameMapping.query.filter_by(exact_match=False)
+                    for partialMatch in nameMappings:
+
+                        search = partialMatch.description
+                        print("search:", search)
+
+                        '''
+                        # this is wrong, keeping as example how to do a search
+                        #nameMapping = NameMapping.query.filter(NameMapping.description.ilike(r"%{}%".format(search))).filter(NameMapping.exact_match == False).first()
+                        
+                        can something like (but not this) work? ilike is a sqlalch thing?
+                        nameMapping = NameMapping.query.filter(search.ilike(r"%{}%".format(nameMapping.description))).filter(NameMapping.exact_match == False).first()
+                        if nameMapping:
+                            print("A: partial found", nameMapping.description, nameMapping.name)
+                        '''
+                        if search in description:
+                            print("B: partial found for search: ", search)
+                            name = partialMatch.name
+
+
+
+                        else:
+                            print("NO MATCH FOUND, using search: ", search)
+
+                # TAGS / CATEGORIES
 
                 # set existing categories - assume all have already been set, can't have 2 entries with the same
                 # description with different categories
@@ -72,20 +109,22 @@ def parseData(db, fileName, accountType, parseExtra=False):
                 #    db.session.close()  # optional, depends on use case
 
 def parseNameMappings(db, fileName):
+    print('parseNameMappings')
     try:
         with open(fileName) as file:
             data = file.readlines()[1:]
             for line in data:
                 if line.strip():  # skip ws
-                    raw = line.strip() # strip newline chars
-                    raw = raw.split(',')  # TODO only split on commas outsied of "'s
-                    raw = list(map(lambda x: x.replace('"', ''), raw))  # strip out "'s
-
+                    #raw = line.strip() # strip newline chars
+                    #raw = raw.split(',')  # TODO only split on commas outsied of "'s
+                    raw = [x.strip().replace('"', '') for x in line.split(',')] # this should remove spaces after a comma and replace " with space
+                    #raw = list(map(lambda x: x.replace('"', ''), raw))  # strip out "'s   TODO: this is messed up by spaces after commas "foo", "bar"  != "foo","bar"
+                    print(raw)
                     description = raw[0]
                     name = raw[1]
-                    #print(description,name)
+                    exact_match = bool(util.strtobool(raw[2]))
 
-                    nameMapping = NameMapping(description=description, name=name)
+                    nameMapping = NameMapping(description=description, name=name, exact_match=exact_match)
                     try:
                         db.session.add(nameMapping)  # will fail if description already exists
                         db.session.commit()

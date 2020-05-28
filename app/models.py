@@ -63,6 +63,8 @@ class NameMapping(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     description = db.Column(db.String(120))  # bank entered name
     name = db.Column(db.String(120))  # user entered name
+    exact_match = db.Column(db.Boolean(), default=True)
+
     __table_args__ = (
         db.UniqueConstraint("description"),
     )

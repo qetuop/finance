@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, BooleanField, SubmitField, SelectField, FileField, TextAreaField
+from wtforms import StringField, PasswordField, BooleanField, SubmitField, SelectField, FileField, TextAreaField, Field
 from wtforms.validators import ValidationError, DataRequired, Email, EqualTo
 #from app.models import User
 
@@ -12,7 +12,9 @@ date = db.Column(db.DateTime)   # transaction for CC
     debit = db.Column(db.Float)
     credit = db.Column(db.Float)
     '''
-
+class PlainTextWidget(object):
+    def __call__(self, field, **kwargs):
+        return field.data if field.data else ''
 
 class EntryForm(FlaskForm):
     entry_id = StringField('Entry ID')
@@ -29,8 +31,8 @@ class EntryForm(FlaskForm):
     submit = SubmitField('Upload')
     accountType = SelectField('Account Type')
     file = FileField()
-    backup = SubmitField('Export')
-    restore = SubmitField('Import')
+    backup = SubmitField('Backup')
+    restore = SubmitField('Restore')
 
 class SummaryForm(FlaskForm):
     category = StringField()
@@ -38,9 +40,12 @@ class SummaryForm(FlaskForm):
 
 class AliasForm(FlaskForm):
     name = StringField() # entry name
+    description = StringField('Description: ')
+    exactMatch = BooleanField('Exact Match', default='checked')
     id = StringField('Entry ID')
     submit = SubmitField('Rename')
     cancel = SubmitField('Cancel')
+
 
 
 class CategoryForm(FlaskForm):

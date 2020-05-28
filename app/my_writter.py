@@ -72,11 +72,11 @@ def writeEntries():
 
 def writeNameMappings():
     nameMappingFile = open('%s/nameMappings.csv'%Config.BACKUP_FOLDER, "w")
-    nameMappingFile.write("\"Description\",\"Name\"\n")
+    nameMappingFile.write("\"Description\",\"Name\", \"Exact Match\n")
 
     nameMappings = NameMapping.query.all()
     for nameMapping in nameMappings:
-        nameMappingFile.write('"{}","{}"\n'.format(nameMapping.description,nameMapping.name))
+        nameMappingFile.write('"{}","{}","{}"\n'.format(nameMapping.description,nameMapping.name, nameMapping.exact_match))
 '''
 def writeTags():
     tagFile = open('%s/tags.csv'%Config.BACKUP_FOLDER, "w")
