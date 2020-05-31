@@ -245,7 +245,7 @@ def tag(id):
             #print('validate_on_submit')
         if form.submit.data:
             print('form.submit.data:', form.name.data, form.category.data, form.subCategory.data)
-            rows_changed = Entry.query.filter_by(description=entry.description).update(dict(tag_id=form.subCategory.data))
+            rows_changed = Entry.query.filter_by(name=entry.name).update(dict(tag_id=form.subCategory.data))
             print(rows_changed)
             db.session.commit()
 
