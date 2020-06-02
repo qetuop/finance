@@ -58,6 +58,22 @@ class Entry(db.Model):
 
         return out
 
+    def getCategory(self):
+        out = 'none'
+        tag = Tag.query.filter_by(id=self.tag_id).first()
+        if tag:
+            out = '{}'.format(tag.category)
+
+        return out
+
+    def getSubCategory(self):
+        out = 'none'
+        tag = Tag.query.filter_by(id=self.tag_id).first()
+        if tag:
+            out = '{}'.format(tag.subCategory)
+
+        return out
+
 
 class NameMapping(db.Model):
     id = db.Column(db.Integer, primary_key=True)

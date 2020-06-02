@@ -4,6 +4,42 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
 
+<style>
+input[type="radio"].toggle {
+  display: none;
+}
+input[type="radio"].toggle:checked + label {
+  background-image: linear-gradient(to top,#969696,#727272);
+  box-shadow: inset 0 1px 6px rgba(41, 41, 41, 0.2),
+                    0 1px 2px rgba(0, 0, 0, 0.05);
+  cursor: default;
+  color: #E6E6E6;
+  border-color: transparent;
+  text-shadow: 0 1px 1px rgba(40, 40, 40, 0.75);
+}
+
+input[type="radio"].toggle + label {
+  width: 3em;
+}
+
+input[type="radio"].toggle:checked + label.btn:hover {
+  background-color: inherit;
+  background-position: 0 0;
+  transition: none;
+}
+
+input[type="radio"].toggle-left + label {
+  border-right: 0;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+input[type="radio"].toggle-right + label {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+</style>
+
 <script>
     console.log(Date());
 </script>
@@ -11,6 +47,15 @@
 <div id="reportrange" style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; width: 100%">
     <i class="fa fa-calendar"></i>&nbsp;
     <span></span> <i class="fa fa-caret-down"></i>
+</div>
+
+<br>
+
+<div id="average">
+    <label class="blue"><input type="radio" name="toggle" onclick="handleClick(this);" value="365"><span>Day</span></label>
+    <label class="green"><input type="radio" name="toggle" onclick="handleClick(this);" value="7"><span>Week</span></label>
+    <label class="yellow"><input type="radio" name="toggle" onclick="handleClick(this);" value="30"><span>Month</span></label>
+    <label class="pink"><input type="radio" name="toggle" onclick="handleClick(this);" value="1"><span>Year</span></label>
 </div>
 
 <br>
@@ -23,6 +68,11 @@
 
 
 <script type="text/javascript">
+var currentValue = 0;
+function handleClick(radio) {
+    alert('New value: ' + radio.value);
+    currentValue = radio.value;
+}
 
 function myFunction(start,end){
 
@@ -62,7 +112,7 @@ $(function() {
            'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
            'Last 7 Days': [moment().subtract(6, 'days'), moment()],
            'Last 30 Days': [moment().subtract(29, 'days'), moment()],
-           'Last 365 Days': [moment().subtract(365, 'days'), moment()],
+           'Last 365 Days': [moment().subtract(364, 'days'), moment()],
            'This Month': [moment().startOf('month'), moment().endOf('month')],
            'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')],
            'Year To Date': [moment().startOf('year'), moment()]

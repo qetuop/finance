@@ -15,6 +15,7 @@ from config import Config
 import sys
 import os
 from datetime import datetime, timedelta
+import json
 from .forms import PlainTextWidget
 
 ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif', 'csv'}
@@ -276,16 +277,80 @@ def summary():
     form = SummaryForm()
     return render_template('summary.html', form=form)
 
+'''
+# create a dictonary of totals/?avgs? for each cat/subcat of a given date range
+ { "period':30,
+   "categories": {
+        "Bills": {"total":100, "Electric": 40, "Water":60},
+        "Entertainent": {total":200, "Resteraut": 120, "Netflix": 80}
+    }
+ }
+ use a tuple instead "Water":(total, Daily, weekly, monthly, yearly)
+'''
+def getTotals(startDate, endDate):
+    amountsDict = {}
+    DAY = 1
+    WEEK = 7
+    MONTH = 30
+    YEAR = 365
+
+    period = (endDate - startDate).days + 1;
+    amountsDict['period'] = period
+
+    # fill in the tags from the DB
+    tags = Tag.query.all()
+
+    # create a unique list of categories - TODO: better way to do this?  Don't use the taglist from setup.py
+    tagList = [tag.category for tag in tags]
+    tagList = list(set(tagList))
+    tagList.sort()
+    amountsDict['categories'] = {}
+
+    for category in tagList:
+        subcats = Tag.query.filter_by(category=category)
+        subcatDict = {tag.subCategory:(0,0,0,0,0) for tag in subcats}
+        subcatDict['aggregate'] = (0,0,0,0,0)
+        amountsDict['categories'][category] = subcatDict
+
+    #print(amountsDict)
+    #print(amountsDict['categories']['Bill']['Car Insurance'])
+
+    entries = Entry.query.filter(Entry.date <= endDate).filter(Entry.date >= startDate)\
+                          .filter((Entry.credit != 0) | (Entry.debit != 0)).all()
+    total = 0
+    for entry in entries:
+
+        # sub cat values
+        tmpAmount = abs(entry.getAmount())
+        prevAmount = amountsDict['categories'][entry.getCategory()][entry.getSubCategory()]
+        newAmount = tmpAmount + prevAmount[0]
+
+        # (total, Daily, weekly, monthly, yearly)
+        vals = (newAmount, round(newAmount/period*DAY,2), round(newAmount/period*WEEK,2), round(newAmount/period*MONTH,2), round(newAmount/period*YEAR),2)
+        amountsDict['categories'][entry.getCategory()][entry.getSubCategory()] = vals
+
+        # Category Aggregate (ex: All Bills)
+        prevAmount = amountsDict['categories'][entry.getCategory()]['aggregate']  # the total agg of the tuple
+        newAmount = tmpAmount + prevAmount[0]
+        vals = (newAmount, round(newAmount/period*DAY,2), round(newAmount/period*WEEK,2), round(newAmount/period*MONTH,2), round(newAmount/period*YEAR),2)
+        amountsDict['categories'][entry.getCategory()]['aggregate'] = vals
+
+    # TODO: remove 0 amount entries
+
+    return amountsDict
+
+
 @app.route('/summary_table', methods=['GET', 'POST'])
 def summary_table(data=None):
     print("summary", request.method, request.args, data)
+    amountsDict = {}
 
     print(request)
     start = request.args.get('start')
     end = request.args.get('end')
 
     if start == None:
-        startDate = datetime.today() - timedelta(days=31)
+        startDate = datetime.today() - timedelta(days=30)
         endDate =  datetime.today()
     else:
         #print('start:', start)
@@ -294,12 +359,14 @@ def summary_table(data=None):
         startDate = datetime.fromtimestamp(int(start)/1000)
         endDate = datetime.fromtimestamp(int(end)/1000)
 
+    amountsDict = getTotals(startDate,endDate)
+
 
     # get start, end date for range from datepicker - if none provided use today/-31days
     #startDate = request.args.get('start', datetime.today() - timedelta(days=31))
     #endDate = request.args.get('end', datetime.today())
     print(startDate.date(),'---',endDate.date())
-
+    '''
     # get current date
     #endDate = datetime.now()
     #startDate = datetime.today() - timedelta(days=range)
@@ -326,7 +393,7 @@ def summary_table(data=None):
                                       .filter(Entry.date <= endDate).filter(Entry.date >= startDate)\
                                       .all()
 
-    #print(tagEntryDict)
+    print('tagEntryDict:',tagEntryDict)
 
     # sum up the amounts
     # quick hack data storage
@@ -336,14 +403,15 @@ def summary_table(data=None):
         for entry in tagEntryDict[category]:
             amount += abs(entry.getAmount())       # may need abs values for charts
 
-        #print(category,tagEntryDict[category], amount)
+        print(category,tagEntryDict[category], amount)
 
         # don't need to display zero values
         if amount > 0:
             data[category] = amount
 
-
+    '''
     form = SummaryForm()
-    print(data)
 
-    return render_template('summary_table.html', form=form, data=data)  # the base.html references the form object, always pass one?
+
+    return render_template('summary_table.html', form=form, data=amountsDict)  # the base.html references the form object, always pass one?
+    #return render_template('summary_table.html', form=form, data=data)  # the base.html references the form object, always pass one?
