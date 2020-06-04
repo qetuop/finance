@@ -281,11 +281,12 @@ def summary():
 # create a dictonary of totals/?avgs? for each cat/subcat of a given date range
  { "period':30,
    "categories": {
-        "Bills": {"total":100, "Electric": 40, "Water":60},
-        "Entertainent": {total":200, "Resteraut": 120, "Netflix": 80}
+        "Bills": {"total":(total, Daily, weekly, monthly, yearly), "Electric": (total, Daily, weekly, monthly, yearly), "Water":(total, Daily, weekly, monthly, yearly)},
+        "Entertainent": {total":(total, Daily, weekly, monthly, yearly), "Resteraut": (total, Daily, weekly, monthly, yearly), "Netflix": (total, Daily, weekly, monthly, yearly)}
     }
  }
  use a tuple instead "Water":(total, Daily, weekly, monthly, yearly)
+ amountsDict['categories'].keys() = [
 '''
 def getTotals(startDate, endDate):
     amountsDict = {}
@@ -361,8 +362,12 @@ def summary_table(data=None):
 
     amountsDict = getTotals(startDate,endDate)
 
+    with open("totals.json", "w") as outfile:
+        json.dump(amountsDict, outfile)
 
-    # get start, end date for range from datepicker - if none provided use today/-31days
+
+
+        # get start, end date for range from datepicker - if none provided use today/-31days
     #startDate = request.args.get('start', datetime.today() - timedelta(days=31))
     #endDate = request.args.get('end', datetime.today())
     print(startDate.date(),'---',endDate.date())

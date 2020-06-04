@@ -1,26 +1,82 @@
-    <table id="summary" border="1">
-        <thead>
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.21/css/jquery.dataTables.min.css">
+
+<style>
+    td.details-control {
+        background: url('../static/details_open.png') no-repeat center center;
+        cursor: pointer;
+    }
+
+    tr.shown td.details-control {
+        background: url('../static/details_close.png') no-repeat center center;
+    }
+</style>
+
+<table id="summary" border="1">
+    <thead>
         <tr>
             <th></th>
             <th>Category</th>
+            <th>SubCategory</th>
             <th>Total Amount</th>
             <th>Daily Avg</th>
             <th>Weekly Avg</th>
             <th>Monthly Avg</th>
             <th>Yearly Avg</th>
         </tr>
-        </thead>
-        <tbody>
+    </thead>
+    <tbody>
         {% for key in data['categories'].keys() %}
-        <tr>
-            <td></td>
-            <td> {{ key }} </td>
-            <td> {{ data['categories'][key]['aggregate'][0]|currency }}</td>
-            <td> {{ data['categories'][key]['aggregate'][1]|currency }}</td>
-            <td> {{ data['categories'][key]['aggregate'][2]|currency }}</td>
-            <td> {{ data['categories'][key]['aggregate'][3]|currency }}</td>
-            <td> {{ data['categories'][key]['aggregate'][4]|currency }}</td>
-        </tr>
+            {% if data['categories'][key]['aggregate'][0] != 0 %}
+                <tr bgcolor="gray">
+                    <td></td>
+                    <td> {{ key }} </td>
+                    <td></td>
+                    <td> {{ data['categories'][key]['aggregate'][0]|currency }}</td>
+                    <td> {{ data['categories'][key]['aggregate'][1]|currency }}</td>
+                    <td> {{ data['categories'][key]['aggregate'][2]|currency }}</td>
+                    <td> {{ data['categories'][key]['aggregate'][3]|currency }}</td>
+                    <td> {{ data['categories'][key]['aggregate'][4]|currency }}</td>
+            {% endif %}
+            </tr>
+            {% for subcat in data['categories'][key].keys() %}
+                {% if subcat != 'aggregate' and data['categories'][key][subcat][0] != 0 %}
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td> {{ subcat }} </td>
+                    <td> {{ data['categories'][key][subcat][0]|currency }}</td>
+                    <td> {{ data['categories'][key][subcat][1]|currency }}</td>
+                    <td> {{ data['categories'][key][subcat][2]|currency }}</td>
+                    <td> {{ data['categories'][key][subcat][3]|currency }}</td>
+                    <td> {{ data['categories'][key][subcat][4]|currency }}</td>
+                </tr>
+                {% endif %}
+            {% endfor %}
         {% endfor %}
-        </tbody>
-    </table>
+    </tbody>
+</table>
+
+    <script type="text/javascript" charset="utf8" src="https://code.jquery.com/jquery-3.5.1.js"></script>
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js"></script>
+
+
+
+<script>
+    // Add event listener for opening and closing details
+    $('#summary tbody').on('click', 'td.details-control', function () {
+        var tr = $(this).closest('tr');
+        var row = table.row(tr);
+        alert('here')
+
+        if (row.child.isShown()) {
+            // This row is already open - close it
+            row.child.hide();
+            tr.removeClass('shown');
+        }
+        else {
+            // Open this row
+            row.child(format(row.data())).show();
+            tr.addClass('shown');
+        }
+    });
+</script>
