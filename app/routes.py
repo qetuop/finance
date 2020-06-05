@@ -157,6 +157,20 @@ def alias(id):
             print('commit mapping')
             db.session.commit()
 
+
+            # update Tags based on Name
+            ''' TODO: Should i do this?  How often does it happen? 
+            tagNameMapping = TagNameMapping.query.filter_by(name=newName).first()
+            print("TAG SEARCH: name={}, found = {}".format(newName, tagNameMapping))
+            if tagNameMapping:
+                print("tagNameMapping:", tagNameMapping.name, tagNameMapping.tag)
+                (category, subCategory) = tagNameMapping.tag.split(':')
+                existsingId = (Tag.query.filter_by(category=category, subCategory=subCategory)).first().id
+                print('existsingId:', existsingId)
+                if existsingId:
+                    tag_id = existsingId
+            '''
+
             return redirect(url_for('index'))
         # The user pressed the "Cancel" button
         else:
@@ -321,7 +335,11 @@ def getTotals(startDate, endDate):
     #print('min:{}, max:{}'.format(min, max))
 
     #period = (endDate - startDate).days + 1;
-    period = (max - min).days
+    # TODO: figure out a better solution :( There is no data for this period so probably should not even continue
+    period = 1
+    if min != None and max != None:
+        period = (max - min).days
+
     #print("period", period)
     amountsDict['period'] = period
 
