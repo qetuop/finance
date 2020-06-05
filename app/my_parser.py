@@ -4,7 +4,7 @@ from app.models import Entry,NameMapping, Tag, TagNameMapping
 from config import Config
 from  distutils import util
 
-def parseData(db, fileName, accountType, parseExtra=False):
+def parseData(db, fileName, accountType):
     with open(fileName) as file:
         data = file.readlines()[1:]
         for line in data:
@@ -69,21 +69,18 @@ def parseData(db, fileName, accountType, parseExtra=False):
                         if search in description:
                             print("B: partial found for search: ", search)
                             name = partialMatch.name
-
-
-
                         else:
                             print("NO MATCH FOUND, using search: ", search)
 
                 # TAGS / CATEGORIES
 
-                # set existing categories - assume all have already been set, can't have 2 entries with the same
-                # description with different categories
+                # default
                 tag_id = (Tag.query.filter_by(category='UNCATEGORIZED').first()).id
 
                 # search TagNameMapping for existing Name:tag
                 tagNameMapping = TagNameMapping.query.filter_by(name=name).first()
-
+                print(TagNameMapping.query.first())
+                print("TAG SEARCH: name={}, found = {}".format(name,tagNameMapping))
                 if tagNameMapping:
                     print("tagNameMapping:", tagNameMapping.name, tagNameMapping.tag)
                     (category,subCategory) = tagNameMapping.tag.split(':')
@@ -99,7 +96,7 @@ def parseData(db, fileName, accountType, parseExtra=False):
                     if existingEntry.tag_id:
                         tag_id = existingEntry.tag_id
                 '''
-
+                '''
                 # reading backupd up data, grab extra fields (name, tag) TODO: how does this meld with the nameMapping?
                 if parseExtra:
                     name = raw[5]
@@ -108,7 +105,7 @@ def parseData(db, fileName, accountType, parseExtra=False):
                     subcategory = tag.split(':')[1]
                     #print(name,category,subcategory)
                     tag_id = (Tag.query.filter_by(category=category).filter_by(subCategory=subcategory).first()).id
-
+                '''
 
                 entry = Entry(date=transDate, posted_date=postedDate, check_number=checkNumber, name=name,
                               description=description, debit=debit, credit=credit, account_type=accountType,
@@ -163,11 +160,11 @@ def parseTagNameMappings(db, fileName):
                     print(raw)
                     name = raw[0]
                     tag = raw[1]
-                    (category,subCategory) = tag.split(':')
 
-                    tagNameMapping = TagNameMapping(category=category, subCategory=subCategory)
+                    tagNameMapping = TagNameMapping(name=name, tag=tag)
+
                     try:
-                        db.session.add(TagNameMapping)  # will fail if already exists
+                        db.session.add(tagNameMapping)  # will fail if already exists
                         db.session.commit()
                     except Exception as e:
                         print(e)

@@ -1,22 +1,20 @@
 from datetime import datetime
 from dateutil.parser import parse
-from app.models import Entry, NameMapping, Tag, AccountType
+from app.models import Entry, NameMapping, Tag, AccountType, TagNameMapping
 from config import Config
 from app import db, format_datetime, format_currency
 
 accountFileDict = {}
-tagNameMappingFile = None
-tagNameMappingDict = {}
 
 def openAccountFile(accountType):
     accountFile = open('%s/%s.csv' % (Config.BACKUP_FOLDER, accountType.replace(' ', '_')), "w")
 
     if accountType == 'Checking':
-        accountFile.write("\"Date\",\"No.\",\"Description\",\"Debit\",\"Credit\",\"Name\",\"Tag\"\n")
+        accountFile.write("\"Date\",\"No.\",\"Description\",\"Debit\",\"Credit\"\n")
     elif accountType == 'Money Market':
-        accountFile.write("\"Date\",\"No.\",\"Description\",\"Debit\",\"Credit\",\"Name\",\"Tag\"\n")
+        accountFile.write("\"Date\",\"No.\",\"Description\",\"Debit\",\"Credit\"\n")
     elif accountType == 'Credit Card':
-        accountFile.write("\"Transaction Date\",\"Posted Date\",\"Description\",\"Debit\",\"Credit\",\"Name\",\"Tag\"\n")
+        accountFile.write("\"Transaction Date\",\"Posted Date\",\"Description\",\"Debit\",\"Credit\"\n")
 
     return accountFile
 
@@ -27,51 +25,23 @@ def writeEntry(entry, accountFile):
     accountType = entry.account_type
 
     if accountType == 'Checking':
-        accountFile.write('"{}","{}","{}","{}","{}","{}","{}"\n'.format(format_datetime(entry.date),
-                                                                                         entry.check_number,
-                                                                                         entry.description,
-                                                                                         format_currency(entry.debit,
-                                                                                                         format='simple'),
-                                                                                         format_currency(entry.credit,
-                                                                                                         format='simple'),
-                                                                                         entry.name,
-                                                                                         entry.displayTag()))
+        accountFile.write('"{}","{}","{}","{}","{}"\n'.format(format_datetime(entry.date),
+                                                             entry.check_number,
+                                                             entry.description,
+                                                             format_currency(entry.debit, format='simple'),
+                                                             format_currency(entry.credit, format='simple')))
     elif accountType == 'Money Market':
-        accountFile.write('"{}","{}","{}","{}","{}","{}","{}"\n'.format(format_datetime(entry.date),
-                                                                                         entry.check_number,
-                                                                                         entry.description,
-                                                                                         format_currency(entry.debit,
-                                                                                               format='simple'),
-                                                                                         format_currency(entry.credit,
-                                                                                               format='simple'),
-                                                                                         entry.name,
-                                                                                         entry.displayTag()))
+        accountFile.write('"{}","{}","{}","{}","{}"\n'.format(format_datetime(entry.date),
+                                                             entry.check_number,
+                                                             entry.description,
+                                                             format_currency(entry.debit, format='simple'),
+                                                             format_currency(entry.credit,format='simple')))
     elif accountType == 'Credit Card':
-        accountFile.write('"{}","{}","{}","{}","{}","{}","{}"\n'.format(format_datetime(entry.date),
-                                                                                        format_datetime(entry.posted_date),
-                                                                                        entry.description,
-                                                                                        format_currency(entry.debit,
-                                                                                               format='simple'),
-                                                                                         format_currency(entry.credit,
-                                                                                               format='simple'),
-                                                                                         entry.name,
-
-                                                                                         entry.displayTag()))
-    # write out this entry's tag
-    writeTagMapping(entry)
-
-def writeTagMapping(entry):
-    global tagNameMappingFile
-    global tagNameMappingDict
-
-    name = entry.name
-    tag = entry.displayTag()  # use string incase ID within table changes at a later date -> need to parse/lookup when reading in
-
-    # only want/should be one copy of a tag per name (hopefully?)
-    if name not in tagNameMappingDict:
-        tagNameMappingDict[name] = tag
-        tagNameMappingFile.write('\"{}\",\"{}\"\n'.format(name,tag))
-
+        accountFile.write('"{}","{}","{}","{}","{}"\n'.format(format_datetime(entry.date),
+                                                            format_datetime(entry.posted_date),
+                                                            entry.description,
+                                                            format_currency(entry.debit,format='simple'),
+                                                             format_currency(entry.credit, format='simple')))
 
 
 def writeAccount(accountType):
@@ -84,15 +54,9 @@ def writeAccount(accountType):
     accountFile.close()
 
 def writeEntries():
-    global tagNameMappingFile
-    tagNameMappingFile = open('%s/tagNameMappings.csv' % (Config.BACKUP_FOLDER), "w")
-    tagNameMappingFile.write('\"Name\",\"Tag\"\n')
-
     accountTypes = AccountType.query.all()
     for accountType in accountTypes:
         writeAccount(accountType.name)
-
-    tagNameMappingFile.close()
 
 def writeNameMappings():
     nameMappingFile = open('%s/nameMappings.csv'%Config.BACKUP_FOLDER, "w")
@@ -101,7 +65,18 @@ def writeNameMappings():
     nameMappings = NameMapping.query.all()
     for nameMapping in nameMappings:
         nameMappingFile.write('"{}","{}","{}"\n'.format(nameMapping.description,nameMapping.name, nameMapping.exact_match))
-'''
+
+def writeTagNameMappings():
+    tagNameMappingFile = open('%s/tagNameMappings.csv' % (Config.BACKUP_FOLDER), "w")
+    tagNameMappingFile.write('\"Name\",\"Tag\"\n')
+
+    tagNameMappings = TagNameMapping.query.all()
+    for tagNameMapping in tagNameMappings:
+        tagNameMappingFile.write('\"{}\",\"{}\"\n'.format(tagNameMapping.name, tagNameMapping.tag))
+
+    tagNameMappingFile.close()
+
+''' TODO: these should proabaly go in a config type file
 def writeTags():
     tagFile = open('%s/tags.csv'%Config.BACKUP_FOLDER, "w")
     tagFile.write("\"Description\",\"Tag\"\n")
@@ -114,6 +89,7 @@ def writeTags():
 def backupData(db):
     writeEntries()
     writeNameMappings()
+    writeTagNameMappings()
 
     #writeTags()
 

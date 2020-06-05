@@ -19,9 +19,9 @@ def restoreData(db):
     parseTagNameMappings(db, '%s/%s' % (Config.BACKUP_FOLDER, 'tagNameMappings.csv'))
     # accounts
 
-    parseData(db, '%s/%s' % (Config.BACKUP_FOLDER, 'Credit_Card.csv'), 'Credit Card', parseExtra=True)
-    parseData(db, '%s/%s' % (Config.BACKUP_FOLDER, 'Money_Market.csv'), 'Money Market', parseExtra=True)
-    parseData(db, '%s/%s' % (Config.BACKUP_FOLDER, 'Checking.csv'), 'Checking', parseExtra=True)
+    parseData(db, '%s/%s' % (Config.BACKUP_FOLDER, 'Credit_Card.csv'), 'Credit Card')
+    parseData(db, '%s/%s' % (Config.BACKUP_FOLDER, 'Money_Market.csv'), 'Money Market')
+    parseData(db, '%s/%s' % (Config.BACKUP_FOLDER, 'Checking.csv'), 'Checking')
 
 if __name__ == '__main__':
     restoreData(db)
