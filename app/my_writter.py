@@ -5,7 +5,8 @@ from config import Config
 from app import db, format_datetime, format_currency
 
 accountFileDict = {}
-
+tagNameMappingFile = None
+tagNameMappingDict = {}
 
 def openAccountFile(accountType):
     accountFile = open('%s/%s.csv' % (Config.BACKUP_FOLDER, accountType.replace(' ', '_')), "w")
@@ -56,6 +57,23 @@ def writeEntry(entry, accountFile):
                                                                                          entry.name,
 
                                                                                          entry.displayTag()))
+    # write out this entry's tag
+    writeTagMapping(entry)
+
+def writeTagMapping(entry):
+    global tagNameMappingFile
+    global tagNameMappingDict
+
+    name = entry.name
+    tag = entry.displayTag()  # use string incase ID within table changes at a later date -> need to parse/lookup when reading in
+
+    # only want/should be one copy of a tag per name (hopefully?)
+    if name not in tagNameMappingDict:
+        tagNameMappingDict[name] = tag
+        tagNameMappingFile.write('\"{}\",\"{}\"\n'.format(name,tag))
+    
+
+
 def writeAccount(accountType):
     accountFile = openAccountFile(accountType)
 
@@ -66,13 +84,19 @@ def writeAccount(accountType):
     accountFile.close()
 
 def writeEntries():
+    global tagNameMappingFile
+    tagNameMappingFile = open('%s/tagNameMappings.csv' % (Config.BACKUP_FOLDER), "w")
+    tagNameMappingFile.write('\"Name\",\"Tag\"\n')
+
     accountTypes = AccountType.query.all()
     for accountType in accountTypes:
         writeAccount(accountType.name)
 
+    tagNameMappingFile.close()
+
 def writeNameMappings():
     nameMappingFile = open('%s/nameMappings.csv'%Config.BACKUP_FOLDER, "w")
-    nameMappingFile.write("\"Description\",\"Name\", \"Exact Match\n")
+    nameMappingFile.write("\"Description\",\"Name\", \"Exact Match\"\n")
 
     nameMappings = NameMapping.query.all()
     for nameMapping in nameMappings:
