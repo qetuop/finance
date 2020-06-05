@@ -17,6 +17,7 @@ import os
 from datetime import datetime, timedelta
 import json
 from .forms import PlainTextWidget
+from sqlalchemy import func
 
 ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif', 'csv'}
 def allowed_file(filename):
@@ -295,7 +296,17 @@ def getTotals(startDate, endDate):
     MONTH = 30
     YEAR = 365
 
-    period = (endDate - startDate).days + 1;
+    # get the ACTUAL min/max date ranges from requested period
+    # ex: Lifetime will set start date to 1970, likely won't have records back to then, the avg calculations will be
+    # off unless I use the actual date range
+    min = db.session.query(func.min(Entry.date)).filter(Entry.date <= endDate).filter(Entry.date >= startDate).scalar()
+    max = db.session.query(func.max(Entry.date)).filter(Entry.date <= endDate).filter(Entry.date >= startDate).scalar()
+
+    #print('min:{}, max:{}'.format(min, max))
+
+    #period = (endDate - startDate).days + 1;
+    period = (max - min).days
+    #print("period", period)
     amountsDict['period'] = period
 
     # fill in the tags from the DB
@@ -313,8 +324,9 @@ def getTotals(startDate, endDate):
         subcatDict['aggregate'] = (0,0,0,0,0)
         amountsDict['categories'][category] = subcatDict
 
-    #print(amountsDict)
-    #print(amountsDict['categories']['Bill']['Car Insurance'])
+    #(amountsDict['categories']['Bill']['Car Insurance'])
+
+
 
     entries = Entry.query.filter(Entry.date <= endDate).filter(Entry.date >= startDate)\
                           .filter((Entry.credit != 0) | (Entry.debit != 0)).all()
@@ -362,15 +374,15 @@ def summary_table(data=None):
 
     amountsDict = getTotals(startDate,endDate)
 
-    with open("totals.json", "w") as outfile:
-        json.dump(amountsDict, outfile)
+    #with open("totals.json", "w") as outfile:
+    #    json.dump(amountsDict, outfile)
 
 
 
         # get start, end date for range from datepicker - if none provided use today/-31days
     #startDate = request.args.get('start', datetime.today() - timedelta(days=31))
     #endDate = request.args.get('end', datetime.today())
-    print(startDate.date(),'---',endDate.date())
+    print(amountsDict['period'], ':', startDate.date(),'---',endDate.date())
     '''
     # get current date
     #endDate = datetime.now()
