@@ -1,6 +1,6 @@
 from datetime import datetime
 from dateutil.parser import parse
-from app.models import Entry,NameMapping, Tag
+from app.models import Entry,NameMapping, Tag, TagNameMapping
 from config import Config
 from  distutils import util
 
@@ -80,10 +80,25 @@ def parseData(db, fileName, accountType, parseExtra=False):
                 # set existing categories - assume all have already been set, can't have 2 entries with the same
                 # description with different categories
                 tag_id = (Tag.query.filter_by(category='UNCATEGORIZED').first()).id
+
+                # search TagNameMapping for existing Name:tag
+                tagNameMapping = TagNameMapping.query.filter_by(name=name).first()
+
+                if tagNameMapping:
+                    print("tagNameMapping:", tagNameMapping.name, tagNameMapping.tag)
+                    (category,subCategory) = tagNameMapping.tag.split(':')
+                    existsingId = (Tag.query.filter_by(category=category, subCategory=subCategory)).first().id
+                    print('existsingId:',existsingId)
+                    if existsingId:
+                        tag_id = existsingId
+
+
+                '''
                 existingEntry = Entry.query.filter_by(description=description).first()
                 if existingEntry:
                     if existingEntry.tag_id:
                         tag_id = existingEntry.tag_id
+                '''
 
                 # reading backupd up data, grab extra fields (name, tag) TODO: how does this meld with the nameMapping?
                 if parseExtra:
@@ -134,4 +149,28 @@ def parseNameMappings(db, fileName):
     except FileNotFoundError:
         print('File does not exist:', fileName)
 
+def parseTagNameMappings(db, fileName):
+    print('parseTagNameMappings')
+    try:
+        with open(fileName) as file:
+            data = file.readlines()[1:]
+            for line in data:
+                if line.strip():  # skip ws
+                    #raw = line.strip() # strip newline chars
+                    #raw = raw.split(',')  # TODO only split on commas outsied of "'s
+                    raw = [x.strip().replace('"', '') for x in line.split(',')] # this should remove spaces after a comma and replace " with space
+                    #raw = list(map(lambda x: x.replace('"', ''), raw))  # strip out "'s   TODO: this is messed up by spaces after commas "foo", "bar"  != "foo","bar"
+                    print(raw)
+                    name = raw[0]
+                    tag = raw[1]
+                    (category,subCategory) = tag.split(':')
 
+                    tagNameMapping = TagNameMapping(category=category, subCategory=subCategory)
+                    try:
+                        db.session.add(TagNameMapping)  # will fail if already exists
+                        db.session.commit()
+                    except Exception as e:
+                        print(e)
+                        db.session.rollback()
+    except FileNotFoundError:
+        print('File does not exist:', fileName)

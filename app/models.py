@@ -89,6 +89,12 @@ class AccountType(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(120))
 
+# keep tag as a string in case the Tag table changes?
+class TagNameMapping(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(120))
+    tag = db.Column(db.String(120)) # Bill:Water
+
 class Tag(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     category = db.Column(db.String(120))

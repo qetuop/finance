@@ -1,7 +1,7 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from config import Config
-from app.models import NameMapping, Tag, Entry, AccountType
+from app.models import NameMapping, Tag, Entry, AccountType, TagNameMapping
 from app.my_parser import parseData, parseNameMappings
 from app import db
 import sys
@@ -33,7 +33,7 @@ def createCategories():
             db.session.add(tag)
             db.session.commit()
 
-def createAccounTypes():
+def createAccountTypes():
     print('createAccounTypes()')
 
     types = ['Checking', 'Money Market', 'Credit Card']
@@ -55,7 +55,7 @@ def setup():
     print('commit')
     db.session.commit()
 
-    createAccounTypes()
+    createAccountTypes()
     createCategories()
 
 def testSetup():

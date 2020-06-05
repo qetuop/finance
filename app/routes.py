@@ -5,7 +5,7 @@ from flask_wtf.file import FileField, FileRequired
 from app import app, db
 from app.forms import EntryForm, AliasForm, CategoryForm, SummaryForm
 #from flask_login import current_user, login_user, logout_user, login_required
-from app.models import Entry, Tag, NameMapping
+from app.models import Entry, Tag, NameMapping, TagNameMapping
 from werkzeug.urls import url_parse
 from werkzeug.utils import secure_filename
 from .my_parser import parseData
@@ -249,6 +249,22 @@ def tag(id):
             print('form.submit.data:', form.name.data, form.category.data, form.subCategory.data)
             rows_changed = Entry.query.filter_by(name=entry.name).update(dict(tag_id=form.subCategory.data))
             print(rows_changed)
+            db.session.commit()
+
+            # update tagNameMapping
+            # Does it already exist
+            tagMapping = TagNameMapping.query.filter_by(name=entry.name).first()
+
+            # add mapping if no row in table with this description
+            if tagMapping is None:
+                tagMapping = TagNameMapping(name=entry.name, tag=entry.displayTag())
+                db.session.add(tagMapping)
+            # else update existing mapping
+            else:
+                rows_changed = TagNameMapping.query.filter_by(name=entry.name).update(dict(tag=entry.displayTag()))
+                print('TagNameMapping - rc:', rows_changed)
+
+            print('commit mapping')
             db.session.commit()
 
             return redirect(url_for('index'))

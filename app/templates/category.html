@@ -6,9 +6,7 @@
     {{ form.hidden_tag() }}
     {{ form.csrf_token }}
 
-    <h1>{{ entry.name }}</h1> <br>
-    {{ form.description.label }} {{ form.description(size="35") }} <br>
-
+    <h1>{{ entry.name }}</h1>
     {{ form.category.label }}
     {{ form.category(size=1) }}
     {# {{ form.category.raw_data }} #}

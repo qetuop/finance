@@ -71,7 +71,7 @@ def writeTagMapping(entry):
     if name not in tagNameMappingDict:
         tagNameMappingDict[name] = tag
         tagNameMappingFile.write('\"{}\",\"{}\"\n'.format(name,tag))
-    
+
 
 
 def writeAccount(accountType):
