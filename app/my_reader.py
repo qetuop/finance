@@ -13,15 +13,36 @@ def restoreData(db):
     setup()
 
     # name Mappings
-    parseNameMappings(db, '%s/%s' % (Config.BACKUP_FOLDER, 'nameMappings.csv'))
+    try:
+        parseNameMappings(db, '%s/%s' % (Config.BACKUP_FOLDER, 'nameMappings.csv'))
+    except FileNotFoundError:
+        print('nameMappings.csv not found')
 
     # tag Mappings
-    parseTagNameMappings(db, '%s/%s' % (Config.BACKUP_FOLDER, 'tagNameMappings.csv'))
-    # accounts
+    try:
+        parseTagNameMappings(db, '%s/%s' % (Config.BACKUP_FOLDER, 'tagNameMappings.csv'))
+    except FileNotFoundError:
+        print('tagNameMappings.csv not found')
 
-    parseData(db, '%s/%s' % (Config.BACKUP_FOLDER, 'Credit_Card.csv'), 'Credit Card')
-    parseData(db, '%s/%s' % (Config.BACKUP_FOLDER, 'Money_Market.csv'), 'Money Market')
-    parseData(db, '%s/%s' % (Config.BACKUP_FOLDER, 'Checking.csv'), 'Checking')
+    # accounts
+    try:
+        parseData(db, '%s/%s' % (Config.BACKUP_FOLDER, 'Credit_Card.csv'), 'Credit Card')
+    except FileNotFoundError:
+        print('Credit_Card.csv not found')
+
+    try:
+        parseData(db, '%s/%s' % (Config.BACKUP_FOLDER, 'Money_Market.csv'), 'Money Market')
+    except FileNotFoundError:
+        print('Money_Market.csv not found')
+
+    try:
+        parseData(db, '%s/%s' % (Config.BACKUP_FOLDER, 'Checking.csv'), 'Checking')
+    except FileNotFoundError:
+        print('Checking.csv not found')
+
+
+
+
 
 if __name__ == '__main__':
     restoreData(db)

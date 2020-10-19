@@ -24,6 +24,7 @@ def createCategories():
         'Income':['Dividend','Wages', 'Gift', 'Tax Refund', 'Cash Back', 'Misc'],
         'Health & Fitness': ['Dentist', 'Medical', 'Lab', 'Vet', 'Haircut', 'Misc'],
         'Investments': ['Vanguard', 'Misc'],
+        'Taxes': ['Federal', 'State & Local', 'Property'],
         'UNCATEGORIZED':['Misc']
     }
 
